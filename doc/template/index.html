@@ -1,0 +1,68 @@
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; Templates</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top>&nbsp;</TD>
+    <TD ALIGN=center><H1>Templates</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+<B>Templates</B><BR>
+<UL>
+<LI><A HREF=default.html>default</A>
+</UL>
+<P>
+<A HREF=#options>options</A><BR>
+<P>
+
+    </TD><TD VALIGN=top>
+
+The <EM>Template</EM> style-elements describe where the text is place in
+the screen.
+<A HREF=../index.html>Portable Presenter</A> currently has only
+one set of templates: the default set.
+
+<H2>General Template <A NAME=options>Options</A></H2>
+
+A <EM>percentage</EM> is a value between <CODE>0</CODE> and
+<CODE>1</CODE> or a string between <CODE>'0%'</CODE> and <CODE>'100%'</CODE>.
+<DL>
+<DT><B>-areaSeparation =&gt;</B> <EM>percentage</EM>
+<DD>The distance which is kept horizontally as well as vertically
+    between the screen parts.
+    <P>
+<DT><B>-titlebarHeight =&gt;</B> <EM>percentage</EM>
+<DD>The height of the title-bar space in relation to the whole height
+    of the display space.
+    <P>
+<DT><B>-place =&gt; [ [</B> <EM>left, top, width, height, string</EM> <B>], ... ]</B><BR>
+    and <EM>left, top, width, height</EM> are <EM>percentages</EM>
+<DD><CODE>-place</CODE> is a list of regions where to put text in.  All
+    templates are lazy: they translate the partioning they have to make
+    into new elements in the <CODE>-place</CODE> list.
+    <P>
+    The percentages are relative to the area which is determined by the
+    <CODE>-backgroundBounds</CODE> defined by the selected
+    <A HREF=../decoration/index.html>Decoration</A>.
+    <P>
+<DT><B>-showTemplateOutlines =&gt;</B> <EM>pixels</EM>
+<DD>Mostly used for debugging template layouts.  The size given is used
+    as line-width.
+    <P>
+</DL>
+<P>
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://www.dhp.nl/~markov/>Mark Overmeer</A>.
+There is no relation between this software product and his employer.<BR>
+Copyright (C) 1999, Free Software Foundation Inc.
+
+    </TD></TR>
+
+</TABLE>
+</HTML>
+

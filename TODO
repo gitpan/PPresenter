@@ -1,0 +1,26 @@
+
+Some wishes:
+
+- Speed improvement.  Scalable fonts for large characters are really
+  slow under X11.  This should be solved.
+
+- Adding TrueType-fonts.  They should be faster than scaling fonts.
+
+- Port and then test Win32 Perl... had no chance to test that...
+
+- Full tutoral on the Markup formatter.  A short version is available.
+
+- Conversion program from the PPresenter's version of MarkUp into real HTML.
+
+- Dump screens to Postscript.
+  Works partially, but the question is whether ImageMagick, my printer, or
+  PPresenter is corrupting the output when slide-images are larger than
+  A5 (half of a4).
+
+- Dump presentation to Website.
+  Now only finals of the slides.  Would be nice to permit intermediate
+  slide-phases too.
+
+- Slides can only be exported as images.  need to create a covertion from
+
+  Markup into real HTML to facilitate other exports.

@@ -1,0 +1,136 @@
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; Decorations</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top>&nbsp;</TD>
+    <TD ALIGN=center><H1>Decorations</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+<B>Decoration</B><BR>
+<UL>
+<LI><A HREF=solid.html>Solid</A>
+</UL>
+<P>
+<A HREF=#options>Options</A><BR>
+<A HREF=#function>Functions</A><BR>
+<P>
+
+    </TD><TD VALIGN=top>
+
+<A HREF=../../index.html>Portable Presenter</A> has a few modules
+which descibe how to decorate a slide.
+<P>
+<I>Decoration</I> describes the background (colours and images) and
+foreground-colours of the slide.  The defaults are influenced by the
+device-type of the <A HREF=../viewport/index.html>viewport</A>.
+
+<H2><A NAME=options>General Decoration Options</A></H2>
+
+All decorations share these options:
+<DL>
+<DT><B>-backgroundBounds =&gt; [ </B> <I>left, top, right, bottom</I> <B>]</B>
+<DD>Limits the action-space of <A HREF=../template/default.html>templates</A>.
+    The values specify the <I>percentage</I> of the screen which should be
+    left empty.<BR>
+    A percentage can be specified as <CODE>'2.5%'</CODE> or <CODE>0.025</CODE>.
+    <P>
+<DT><B>-backdrop =&gt;</B> <I>boolean</I>
+<DD>Backdrop is a slidely shifted character behind the real character.  The
+    use of backdrop improves the readability of text on poor displaying
+    hardware, as TV-screens.
+    <P>
+    You can set backdrop on for the whole slide (or show) with this option,
+    or use the <CODE>BD</CODE> tag in the
+    <A HREF=../formatter/markup.html>markup formatter</A>.
+    <P>
+<DT><B>-fgcolor =&gt;</B> <I>color</I>
+<DT><B>-bgcolor =&gt;</B> <I>color</I>
+<DT><B>-bdcolor =&gt;</B> <I>color</I>
+<DD>The <CODE>bgcolor</CODE> defines the solid color of the background.
+    <CODE>fgcolor</CODE> contains the default color of the foreground
+     --the color of the text.  <CODE>bdcolor</CODE> is the backdrop color.
+    These values overrule the device dependent defaults.
+    <P>
+<DT><B>-nestImages =&gt; [ </B> <I>geometry, image, ... </I> <B>]</B>
+<DD>List of images to be used in unordered-lists
+    (as created by a <A HREF=../formatter/index.html>formatter</A>)
+    <P>
+    The color and shape of the images used may change with the images on the
+    background and the colors for the foreground, so are defined in
+    this style-element.
+    <P>
+    When you specify a geometry, you can specify a list of image-names,
+    filenames, or
+    <A HREF=../image/magick.html>PPresenter::<WBR>Image::Magick</A> objects.
+    <A HREF=../image/tkphoto.html>PPresenter::<WBR>Image::tkPhoto</A> objects
+    are not allowed, because they are already scaled on definition.
+    <P>
+    When the geometry is <CODE>undef</CODE> then the list can contain
+    image-names, filenames, and
+    <A HREF=../image/index.html>PPresenter::Image</A> objects.  The images
+    will not be scaled.
+    <P>
+    See the examples on how to create and use
+    <A HREF=../image/index.html>images</A>.
+    <P>
+</DL>
+
+<H2>Settings with <A NAME=function>Function</A>-calls</H2>
+Decorations contain a few settings which can not be set simply by
+option-flags with a slide, but only by calling a function.
+<DL>
+<DT><B>devices =&gt;</B> <I>hash-of-devs</I>,
+    where <I>devs</I> relate a name to a ref-array
+    with <B>[</B> <I>bgcolor, fgcolor, bdcolor, backdrop</I> <B>]</B>
+    <P>
+<DD>This hash defines the default colors to be used per device.
+    Do not change device definitions, but add new devices with
+<PRE>
+$show->find(decoration => 'SELECTED')
+     ->addDevice(<I>name, fg, bg, bd, backdrop</I>);
+</PRE>
+    Devices are added in front of the list, so when you add a device
+    specification with an existing name, the original will not be
+    used anymore.
+    <P>
+    Predefined values are:
+    <CENTER>
+    <TABLE WIDTH=80% BORDER=1>
+    <TR><TH>device</TH>
+        <TH>background<BR>colour</TH>
+        <TH>foreground<BR>colour</TH>
+        <TH>backdrop<BR>colour</TH>
+        <TH>default<BR>backdrop</TH></TR>
+    <TR><TD>lcd</TD><TD>dark blue</TD><TD>yellow</TD><TD>black</TD><TD>1 (on)</TD></TR>
+    <TR><TD>beamer</TD><TD>white</TD><TD>black</TD><TD>gray</TD><TD>0 (off)</TD></TR>
+    <TR><TD>printer</TD><TD>white</TD><TD>black</TD><TD>gray</TD><TD>0 (off)</TD></TR>
+    </TABLE></CENTER>
+    <P>
+    Use `<CODE>-backdrop =&gt; <I>boolean</I></CODE>'
+    to overrule the backdrop for device.  To change the default colours, you
+    can add a new device.  Do not forget to select the new device (even when
+    it has the same name as the selected device):
+<PRE>
+$show->find('decoration')
+     ->addDevice(qw/lcd black white yellow 0/);
+$show->select(decoration => 'lcd');
+</PRE>
+    <P>
+</DL>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://www.dhp.nl/~markov/>Mark Overmeer</A>.
+There is no relation between this software product and his employer.<BR>
+Copyright (C) 1999, Free Software Foundation Inc.
+
+    </TD></TR>
+
+</TABLE>
+</HTML>
+

@@ -1,0 +1,75 @@
+#!/usr/local/bin/perl -w
+# Copyright (C) 1999, Free Software Foundation Inc.
+#
+# This file demonstrates possibilities of tags and timing.
+# It is especially interesting to see in which way the slide-control
+# window is produced from the data below.
+#
+
+use lib '..';
+use PPresenter;
+
+my $show = PPresenter->new
+   ( -name       => 'Tags and Timing demo'
+   , -geometry   => '640x480'
+   , -totaltime  => 5*60
+#  , -tags       => [ 'all' ]    # Overrules slide's -active spec.
+   );
+$show->select(template => 'tm'); # I know it is the default.
+$show->select(fontset  => 'scaling');
+
+$show->addSlide
+   ( -title      => 'first slide'
+   , -reqtime    => 75
+   , -main       => <<MAIN
+You start the show with <TT>g</TT>, and halt it
+with <TT>h</TT>.
+<P>
+Start the timer now, and see the progress bar moving
+slowly.
+MAIN
+   );
+
+$show->addSlide
+   ( -title      => 'second slide'
+   , -active     => 0
+   );
+
+$show->addSlide
+   ( -title      => 'third slide: proceeds after 10 secs'
+   , -reqtime    => 10
+   , -proceed    => 'TIME'
+   , -main       => <<MAIN
+The second slide was skipped, because it is not
+selected.
+<P>
+See the popup (press <TT>s</TT>)
+MAIN
+   );
+
+$show->addSlide
+   ( -title      => 'fourth slide'
+   , -reqtime    => 30
+   );
+
+$show->addSlide
+   ( -title      => 'fifth slide: proceeds immediately'
+   , -tag        => 'shorter'
+   , -proceed    => 'NOW'
+   );
+
+$show->addSlide
+   ( -title      => 'sixth slide'
+   , -tags       => [ 'shorter', 'panic' ]
+   , -main       => <<MAIN
+To demonstrate tags.  Play around with them!  (in the control menu)
+MAIN
+   );
+
+$show->addSlide
+   ( -title      => 'seventh slide'
+   , -tags       => 'panic'
+   );
+
+$show->run
+

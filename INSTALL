@@ -1,0 +1,59 @@
+Copyright (C) 1999, Free Software Foundation Inc.
+
+- INSTALL
+
+Portable Presenter is a fully Perl/Tk compliant package, so as
+long as you have compiled a recent Perl and Tk, it should work
+`out the box'.
+
+** What do you need?
+
+Install the following packages.  The version-numbers are indications;
+it might be that earlier versions work too.
+- Perl 5.005_02 or higher
+  You can best use the latest stable version, which is located at
+  http://www.CPAN.org/src/stable.tar.gz
+- Perl/Tk 800.015      (obligatory)
+  http://www.CPAN.org/modules/by-module/Tk/Tk800.015.tar.gz
+- X11::Protocol v0.04  (optional)
+  http://www.CPAN.org/modules/by-module/X11/X11-Protocol-0.04.tar.gz
+
+For ImageMagick:       (optional)
+from http://www.wizards.dupont.com/cristy/ImageMagick/
+- libjpeg.so.6      
+- ImageMagick v4.2.9
+- PerlMagick v4.29
+The website of ImageMagick will change to www.ImageMagick.org with
+the coming release of version 5.1.
+
+You can really better install all these packages straight from
+source, because in my experience, the rpms do not go nice together.
+
+** Installing this package.
+
+Unpack the package (hey! you did of course, otherwise you wouldn't
+be able to read this messsage) with, and install:
+
+   gzip -d < PPresenter-v*.tar.gz | tar xf -
+   cd PPresenter-v?.??
+   perl Makefile.PL
+   make install
+
+This package does not contain any binaries.  You can install, upgrade
+or remove the other packages without the need to reinstall PPresenter.
+
+** Warning
+
+WARNING:
+   Do not run PPresenter files which you have downloaded from the Net: they
+   are Perl programs, hence can perform any task on your system without
+   you noticing it.
+   Presentation should be distrubed as websites or postscript.  See the
+   export facilities on how to create them.
+
+** Questions?
+
+For questions, bug reports, and contributions mail to: gpp@dhp.nl
+
+Mark Overmeer
+http://www.dhp.nl/~markov/

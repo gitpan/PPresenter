@@ -1,0 +1,66 @@
+
+v1.00
+Thanks to Slaven Rezic:
+* Removed dependency from Time::Hires because Tk defines (but does document)
+  a timeofday(), with the same functionality.
+* PPresenter/Image/tkPhoto.pm line 88: splice 5 i.s.o 6 fixed again :((
+* PPresenter/Image.pm: sameSource works for non-UNIX too (now).
+* Runs on M$Win32!
+
+Other changes:
+* Added start of a faq in doc/faq/*
+* Added link to options.html (general option index) in doc/manual.html
+* Added demo/simple
+* Added doc/example.html
+
+v0.97
+* PPresenter/Images.pm line 176 findImage() fixed.
+* PPresenter/Images.pm line 128 create image accepts image name when
+  this is an already defined image.
+* PPresenter/Viewport/TagControl.pm and PPresenter/Viewport/SlideControl.pm
+  added scrollbars when the menu get too large.
+* PPresenter/Export/HTML.pm replace by PPresenter/Export/Website.pm.
+* PPresenter/Export/Website.pm created, which creates a website.  Some other
+  modules are extended to make this prossible.
+* PPresenter/Export/IM_Images.pm improved.
+* doc/export/website.html added.
+* doc/export/im_images.html added.
+* doc/export/index.html extended with option doc.
+
+v0.96  1999/10/31
+* PPresenter/Show.pm called 'after()' on non-window object.
+  did work for perl 5.005_02, not for perl 5.005_3.
+* PPresenter/Image/tkPhoto.pm line 88: splice 5 i.s.o 6
+
+v0.95  1999/10/28
+* GNU-style changelogs started (with more details, I promise)
+* Added copyright-statements where needed for FSF.
+* Tutorial for beginners: doc/tutorial/beginners*.
+* Tutorial about difference HTML-Markup: doc/tutorial/html2markup/*.
+* Folded PPresenter/Template/Default/* inside PPresenter/Template/Default.pm
+* PPresenter/StyleElem.pm INCLUDES do not load modules when already known.
+
+v0.94  1999/09/26
+* Few fixes.
+* Shows phases to go for a slide.
+* Exporting slides to images works (requires ImageMagick).
+
+v0.93 1999/09/08
+* Few fixes.
+* Introduction of special characters in markup-language.
+* Initial code to dump slides to postscript, images and HTML.
+
+v0.92 1999/08/12
+* Implemented (and documented) scaling of images
+* optional use of Image::Magick
+
+v0.91 1999/08/02
+* Documented all the features.
+* fixed some things.
+* Closing in to version 1
+
+v0.28 1999/07/28
+* Full rewrite to allow multiple screens in one show.
+
+v0.21 1999/07/04
+* The first public version is available.
