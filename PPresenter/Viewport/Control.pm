@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 # PPresenter::Viewport::Control
 #
@@ -19,7 +19,7 @@ use PPresenter::Viewport::SlideControl;
 use PPresenter::Viewport::TagControl;
 use PPresenter::Viewport::Phases;
 
-use constant defaults =>
+use constant ObjDefaults =>
 { -showSlideNotes     => 0
 , -includeControls    => 0
 , -resizable          => undef
@@ -130,13 +130,14 @@ sub add_controls()
 
 sub showControls($)
 {   my ($viewport, $do_show) = @_;
-    if($do_show) {$viewport->add_controls}
-    else         {$viewport->remove_controls}
+    $do_show ? $viewport->add_controls : $viewport->remove_controls;
+    $viewport;
 }
 
 sub busy($)
 {   my ($viewport, $on) = @_;
     $on ? $viewport->{screen}->Busy : $viewport->{screen}->Unbusy;
+    $viewport;
 }
 
 sub packViewport()
@@ -145,7 +146,7 @@ sub packViewport()
     # Take all widgets from the viewport.
     my $screen     = $viewport->{screen};
     my @components = $screen->packSlaves;
-    defined @components && map {$_->packForget} @components;
+    @components && map {$_->packForget} @components;
 
     # Create a normal viewport.
 
@@ -185,7 +186,9 @@ sub update($$)
 
     $viewport->{neighbours}->update($left, "$slide", $right);
     $viewport->{slidebar}->update($slide);
-    $viewport->{progressbar}->expectedArrival($viewport->{slidebar}->endOfSlide)
+    $viewport->{progressbar}
+               ->expectedArrival($viewport->{slidebar}->endOfSlide);
+    $viewport;
 }
 
 sub slideSelectionChanged()
@@ -193,6 +196,7 @@ sub slideSelectionChanged()
     $viewport->{slidebar}->reconstruct;
     $viewport->{slidecontrol}->selectionChanged;
     $viewport->{tagcontrol}->selectionChanged;
+    $viewport;
 }
 
 sub make_popup($$$$)

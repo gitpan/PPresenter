@@ -1,12 +1,10 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 package PPresenter::SlideView;
 
 use strict;
 use PPresenter::Object;
 use base 'PPresenter::Object';
-
-use Tk qw(DONT_WAIT ALL_EVENTS DoOneEvent);
 
 sub new($$$)
 {   my ($class, $show, $slide, $style_flags, $viewport) = @_;
@@ -17,27 +15,46 @@ sub new($$$)
     , show           => $show
     , slide          => $slide
     , viewport       => $viewport
-    , screen         => $viewport->getScreen
-    , canvas         => $viewport->getCanvas
-    , style_elements => $viewport->getStyleElems($slide, $style_flags)
+    , canvas         => $viewport->canvas
+    , style_elements => $viewport->styleElems($slide, $style_flags)
+    , id             => undef
     }, $class;
 
     $view->getOptions($class)->InitObject;
 }
 
 sub setOptions($) {$_[0]->{options} = $_[1]}
-sub decoration()  {$_[0]->{decoration}}
-sub fontset()     {$_[0]->{fontset}   }
-sub formatter()   {$_[0]->{formatter} }
-sub template()    {$_[0]->{template}  }
-sub dynamic()     {$_[0]->{dynamic}   }
+sub decoration()  {shift->{decoration}}
+sub fontset()     {shift->{fontset}   }
+sub formatter()   {shift->{formatter} }
+sub template()    {shift->{template}  }
+sub dynamic()     {shift->{dynamic}   }
 
-sub getViewport() {$_[0]->{viewport}  }
+sub viewport()    {shift->{viewport}  }
 sub showsOnViewport($) {"$_[0]->{viewport}" eq "$_[1]"}
+sub canvas()      {shift->{viewport}->canvas}
+sub device()      {shift->{viewport}->device}
 
-sub getCanvas()   {$_[0]->{viewport}->getCanvas}
-sub nextPhase()   {$_[0]->{program}->nextPhase}
+sub nextPhase()   {shift->{program}->nextPhase}
+sub inLastPhase() {shift->{program}->inLastPhase}
+sub gotoPhase($)  {shift->{program}->gotoPhase(@_)}
+sub phase()       {shift->{program}->phase}
 sub image(@)      {shift->{show}->image(@_)}
+sub id()          {shift->{id}}
+
+sub exportedPhases()
+{   my $view = shift;
+    $view->{dynamic}->exportedPhases($view->{program});
+}
+
+sub canvasDimensions()   # often requested, hence answer is cached.
+{   my $view = shift;
+
+    $view->{dims} = [ $view->{viewport}->canvasDimensions ]
+        unless exists $view->{dims};
+
+    @{$view->{dims}};
+}
 
 #
 # Just passing on...
@@ -45,12 +62,12 @@ sub image(@)      {shift->{show}->image(@_)}
 
 sub hasBackdrop()
 {   my $view = shift;
-    $view->{decoration}->hasBackdrop($view->{viewport}->getDevice);
+    $view->{decoration}->hasBackdrop($view->{viewport}->device);
 }
 
-sub getColor(@)
+sub color(@)
 {   my $view = shift;
-    $view->{decoration}->getColor($view->{viewport}->getDevice, @_);
+    $view->{decoration}->color($view, @_);
 }
 
 sub findFontSize($@)
@@ -58,19 +75,17 @@ sub findFontSize($@)
     $view->{fontset}->findFontSize($view->{viewport}, @_);
 }
 
-sub getBounds() {$_[0]->{decoration}->getBounds}
-sub getFont(@)  {shift->{fontset}->getFont(@_)}
-sub getTitle()  {$_[0]->{template}->getTitle}
-sub format(@)   {shift->{formatter}->format(@_)}
+sub font(@)   {shift->{fontset}->font(@_)}
+sub title()   {shift->{template}->title}
 
-sub getNestImage($)
+sub nestImage($)
 {   my ($view, $name) = @_;
-    my ($geom, $img) = $view->{decoration}->getNestImageDef($name);
+    my ($geom, $img) = $view->{decoration}->nestImageDef($name);
 
     $view->{show}->image
       ( (ref $img ? $img : (-file => $img))
       , (defined $geom
-         ? (-sizeBase => $geom, -resize => 1)
+         ? (-sizeBase => $geom, -resize => 0)
          : (-resize => 0)
         )
       );
@@ -85,7 +100,7 @@ sub makeBackground()
 
     $view->{viewport}->setBackgroundId(
         $view->{decoration}->makeBackground
-           ( $view->{viewport}->getBackgroundId
+           ( $view->{viewport}->backgroundId
            , @$view{qw/show slide viewport/}
            ));
 }
@@ -108,6 +123,8 @@ sub explode($$)
 
         $view->{$_} = $elem;
     }
+
+    $view;
 }
 
 sub implode
@@ -115,6 +132,8 @@ sub implode
 
     map {delete $slide->{$_}}
         keys %{$view->{style_elements}};
+
+    $view;
 }
 
 # This is a dirty trick: to collect all options of all style elements
@@ -144,17 +163,9 @@ sub prepare($$)
     my $show       = $view->{show};
     $view->{program} = $view->dynamic->makeProgram($show, $view, $displace_x);
 
-    $view->template->prepareSlide(
-       { show       => $show
-       , slide      => $slide
-       , view       => $view
-       , viewport   => $view->{viewport}
-       , canvas     => $view->{canvas}
-       , screen     => $view->{screen}
-       , program    => $view->{program}
-       , displace_x => $displace_x
-       , id         => ($view->{id} = "s".$unique_id++)
-       } );
+    $view->{id} = "s".$unique_id++;
+    $view->template->prepareSlide($show, $slide, $view)
+                   ->createSlide($show, $slide, $view, $displace_x);
 
     $view->implode($slide);
 }
@@ -162,16 +173,17 @@ sub prepare($$)
 sub show($)
 {   my ($view,$slide) = @_;
     $view->{viewport}->setSlide($slide, $view->{id});
-    $view->makeBackground;
+    $view;
 }
 
 #
 # Program
 #
 
-sub addProgram(@)
-{   my $view = shift;
-    $view->{dynamic}->parse($view->{program}, $view->{slide}, @_);
+sub addProgram($$)
+{   my ($view, $string, $tag_or_callback) = @_;
+    $view->{dynamic}
+         ->parse($view->{program}, $view->{slide}, $tag_or_callback, $string);
 }
 
 sub startProgram()
@@ -181,49 +193,6 @@ sub startProgram()
 
 sub removeProgram()
 {   delete shift->{program};
-}
-
-#
-# Export
-#
-
-sub exportView($$@)
-{   my ($view, $borders, $function) = splice @_, 0, 3;
-    my ($viewport, $show) = @$view{ qw/viewport show/ };
-
-    $viewport->raise;
-    $viewport->sync;
-
-    foreach (1..30)
-    {   1 while DoOneEvent(DONT_WAIT|ALL_EVENTS);
-        $viewport->after(100);
-    }
-
-    my %opts =
-    ( window_id => ($borders ? $viewport->getScreenId : $viewport->getCanvasId)
-    , borders   => $borders
-    , viewport  => $viewport
-    , display   => $viewport->getDisplay
-    , view      => $view
-    );
-
-    map {$opts{$_} = $view->{$_}} qw/show slide canvas template formatter/;
-
-    while(@_)                     # Extra user options.
-    {   my ($key, $value) = (shift, shift);
-        $opts{$key} = $value;
-    }
-
-    if(ref $function eq 'ARRAY')  # function = [ CODE, arg, ... ]
-    {   @_ = @$function;
-        $function = shift;
-        $function->(@_, \%opts);
-    }
-    else
-    {   $function->(\%opts);      # function = &f
-    }
-
-    $view;
 }
 
 1;

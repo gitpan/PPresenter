@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 # TagControl
 # A window which shows the tags, and enables the user to select and

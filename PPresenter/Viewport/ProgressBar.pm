@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 package PPresenter::Viewport::ProgressBar;
 
@@ -10,7 +10,7 @@ sub new($$)
 
     my $width = $viewport->{-progressLineWidth};
 
-    my $display  = $viewport->getScreen->Canvas
+    my $display  = $viewport->screen->Canvas
        ( -background => $viewport->{-progressBackground}
        , -height     => 2*$width+3
        );

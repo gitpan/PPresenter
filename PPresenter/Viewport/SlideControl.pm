@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 #
 # SlideControl
@@ -28,7 +28,7 @@ sub new($$$)
        }, $class;
 
     my $totaltime = $show->{-totaltime};
-    my @slides    = $show->getSlides;
+    my @slides    = $show->slides;
 
     my $table = $control->Table
         ( -scrollbars => (@slides < 15 ? '' : 'w')
@@ -61,7 +61,7 @@ sub new($$$)
     foreach my $slide (@slides)
     {   my ($max, $name, $spent) = $slide->statusButtons($show, $table,
            , $info->{-progressColors}
-           , [ sub {$show->showSlide($_[0])}, $slide->getNumber ]
+           , [ sub {$show->showSlide($_[0])}, $slide->number ]
            );
 
         push @{$self->{spent_buttons}}, $spent;
@@ -84,9 +84,9 @@ sub selectionChanged()
     my $sumtime         = 0;
     my $selected_slides = 0;
 
-    foreach ($self->{show}->getSlides)
+    foreach ($self->{show}->slides)
     {   next unless $_->isActive;
-        $sumtime += $_->getRequiredTime;
+        $sumtime += $_->requiredTime;
         $selected_slides++;
     }
 
@@ -100,7 +100,7 @@ sub clockTic($$)
 {   my ($self, $interval, $current_slide) = @_;
 
     $self->{runtime}->configure(-step => $interval);
-    $self->{spent_buttons}[$current_slide->getNumber]
+    $self->{spent_buttons}[$current_slide->number]
          ->configure(-step => $interval);
 }
 

@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 package PPresenter::Template::Default;
 
@@ -19,8 +19,8 @@ use strict;
 use PPresenter::Template;
 use base 'PPresenter::Template';
 
-sub make_HTML_Linear($)
-{   my ($templ, $args);
+sub make_HTML_Linear($$)
+{   my ($templ, $slide, $view) = @_;
 
     my @parts;
     push @parts, $templ->{-left}     if exists $templ->{-left};
@@ -29,7 +29,7 @@ sub make_HTML_Linear($)
     push @parts, @{$templ->{-place}} if exists $templ->{-place};
 
     join "\n<P>\n",
-       map {$templ->toHTML($args, $templ->{-main})}
+       map {$templ->toHTML($view->formatter, $_)}
            @parts;
 }
 
@@ -39,7 +39,7 @@ use strict;
 use PPresenter::Template::Default;
 use base 'PPresenter::Template::Default';
 
-use constant defaults =>
+use constant ObjDefaults =>
 { -name         => 'default big-left title right'
 , -aliases      => [ 'dbltr', 'big-left title right', 'bltr',
                      'dtrbl', 'title right big-left', 'trbl' ]
@@ -47,36 +47,37 @@ use constant defaults =>
 , -right        => undef
 };
 
-sub prepareSlide($$)
-{   my ($templ, $args) = @_;
+sub prepareParts($$)
+{   my ($templ, $slide, $view) = @_;
 
-    my $sep  = $templ->toPercentage($templ->{-areaSeparation});
-    my $colw = (1-$sep)/2;
-    my $tbh  = $templ->toPercentage($templ->{-titlebarHeight});
-    my $t    = $tbh + $sep;
+    $templ->SUPER::prepareParts($slide, $view);
 
-    my $view = $args->{view};
-    unshift @{$templ->{-place}}
-        , [ -$colw, 0,  $colw, $tbh, $view->formatter->titleFormat
-                    ($view, $args->{slide}->getTitle) ]
-        , [ 0, 0,       $colw, 1,    $templ->{-left}  ]
-        , [ -$colw, $t, $colw, 1-$t, $templ->{-right} ];
+    my $deco          = $view->decoration;
+    my ($sepx, $sepy) = $deco->separationXY($view);
+    my $titleh        = $deco->titlebarHeight($view);
+    my $has_footer    = $templ->hasFooter;
 
-    $templ->SUPER::prepareSlide($args);
+    my ($x0, $y0, $x1, $y1) = $deco->mainBoundsNoTitle($view, $has_footer);
+    my $colw = ($x1-$x0-$sepx)/2;
+
+    $templ->addPart2Make($x0, $y0, $x0+$colw, $y1, $templ->{-left}, 'main')
+          ->addPart2Make($x1-$colw, $y0, $x1, $y0+$titleh
+            , $view->formatter->titleFormat($view, $slide->title) , 'main')
+          ->addPart2Make($x1-$colw, $y0+$titleh+$sepy, $x1, $y1
+            , $templ->{-right}, 'main');
 }
 
 sub make_HTML_table($$)
-{   my ($templ, $args) = @_;
+{   my ($templ, $slide, $view) = @_;
 
     "<TABLE WIDTH=100%>\n<TR><TD VALIGN=top ROWSPAN=2>"
-    . $templ->toHTML($args, $templ->{-left})
+    . $templ->toHTML($view->formatter, $templ->{-left})
     . "</TD><TD ALIGN=center WIDTH=50%><H1>"
-    . $templ->toHTML($args, $args->{slide}->getTitle)
+    . $templ->toHTML($view->formatter, $slide->title)
     . "</H1></TD></TR>\n<TR><TD VALIGN=top WIDTH=50%>"
-    . $templ->toHTML($args, $templ->{-right})
+    . $templ->toHTML($view->formatter, $templ->{-right})
     . "</TD></TR>\n</TABLE>\n";
 }
-
 
 package PPresenter::Template::Default::BigRightTitleLeft;
 
@@ -84,7 +85,7 @@ use strict;
 use PPresenter::Template::Default;
 use base 'PPresenter::Template::Default';
 
-use constant defaults =>
+use constant ObjDefaults =>
 { -name         => 'default big-right title left'
 , -aliases      => [ 'dbrtl', 'big-right title left', 'brtl'
                    , 'dtlbr', 'title left big-right', 'tlbr' ]
@@ -92,33 +93,36 @@ use constant defaults =>
 , -right        => undef
 };
 
-sub prepareSlide($)
-{   my ($templ, $args) = @_;
+sub prepareParts($$)
+{   my ($templ, $slide, $view) = @_;
 
-    my $sep  = $templ->toPercentage($templ->{-areaSeparation});
-    my $colw = (1-$sep)/2;
-    my $tbh  = $templ->toPercentage($templ->{-titlebarHeight});
-    my $t    = $tbh + $sep;
+    $templ->SUPER::prepareParts($slide, $view);
 
-    my $view = $args->{view};
-    unshift @{$templ->{-place}}
-        , [ 0, 0,      $colw, $tbh, $view->formatter->titleFormat
-                   ($view, $args->{slide}->getTitle) ]
-        , [ 0, $t,     $colw, 1-$t, $templ->{-left}  ]
-        , [ -$colw, 0, $colw, 1,    $templ->{-right} ];
+    my $deco          = $view->decoration;
+    my ($sepx, $sepy) = $deco->separationXY($view);
+    my $titleh        = $deco->titlebarHeight($view);
+    my $has_footer    = $templ->hasFooter;
 
-    $templ->SUPER::prepareSlide($args);
+    my ($x0, $y0, $x1, $y1) = $deco->mainBoundsNoTitle($view, $has_footer);
+    my $colw = ($x1-$x0-$sepx)/2;
+
+    $templ->addPart2Make($x0, $y0, $x0+$colw, $y0+$titleh
+            , $view->formatter->titleFormat($view, $slide->title), 'main')
+          ->addPart2Make($x0, $y0+$titleh+$sepy, $x0+$colw, $y1
+            , $templ->{-left}, 'main')
+          ->addPart2Make($x1-$colw, $y0, $x1, $y1, $templ->{-right}, 'main');
 }
 
 sub make_HTML_table($$)
-{   my ($templ, $args) = @_;
+{   my ($templ, $slide, $view) = @_;
 
+    my $formatter = $slide->formatter;
     "<TABLE WIDTH=100%>\n<TR><TD ALIGN=center WIDTH=50%><H1>"
-    . $templ->toHTML($args, $args->{slide}->getTitle)
+    . $templ->toHTML($formatter, $slide->title)
     . "</H1></TD>\n<TD COLSPAN=2 VALIGN=top>"
-    . $templ->toHTML($args, $templ->{-right})
+    . $templ->toHTML($formatter, $templ->{-right})
     . "</TD></TR>\n<TR><TD VALIGN=top WIDTH=50%>"
-    . $templ->toHTML($args, $templ->{-left})
+    . $templ->toHTML($formatter, $templ->{-left})
     . "</TD></TR>\n</TABLE>\n";
 }
 
@@ -129,7 +133,7 @@ use strict;
 use PPresenter::Template::Default;
 use base 'PPresenter::Template::Default';
 
-use constant defaults =>
+use constant ObjDefaults =>
 { -name         => 'default empty'
 , -aliases      => [ 'de', 'empty', 'e' ]
 };
@@ -141,7 +145,7 @@ use strict;
 use PPresenter::Template::Default;
 use base 'PPresenter::Template::Default';
 
-use constant defaults =>
+use constant ObjDefaults =>
 { -name         => 'default front page'
 , -aliases      => [ 'dfp', 'front page', 'fp' ]
 , -author       => undef
@@ -150,8 +154,10 @@ use constant defaults =>
 , -date         => undef
 };
 
-sub prepareSlide($)
-{   my ($templ, $args) = @_;
+sub prepareParts($$)
+{   my ($templ, $slide, $view) = @_;
+
+    $templ->SUPER::prepareParts($slide, $view);
 
 print "Not implemented yet.\n";
 
@@ -165,28 +171,28 @@ use strict;
 use PPresenter::Template::Default;
 use base 'PPresenter::Template::Default';
 
-use constant defaults =>
+use constant ObjDefaults =>
 { -name         => 'default main'
 , -aliases      => [ 'dm', 'main', 'm' ]
 , -main         => undef
 };
 
-sub prepareSlide($)
-{   my ($templ, $args) = @_;
+sub prepareParts($$)
+{   my ($templ, $slide, $view) = @_;
 
-    my $tbh  = $templ->toPercentage($templ->{-titlebarHeight});
-    my $t    = $tbh + $templ->toPercentage($templ->{-areaSeparation});
+    $templ->SUPER::prepareParts($slide, $view);
 
-    unshift @{$templ->{-place}}, [ 0, 0, 1, 1, $templ->{-main} ];
-
-    $templ->SUPER::prepareSlide($args);
+    $templ->addPart2Make
+    ( $view->decoration->mainBoundsNoTitle($view, $templ->hasFooter)
+    , $templ->{-main}, 'main'
+    );
 }
 
 sub make_HTML_table($$)
-{   my ($templ, $args) = @_;
+{   my ($templ, $slide, $view) = @_;
 
     "<TABLE WIDTH=100%>\n<TR><TD VALIGN=top>"
-    . $templ->toHTML($args, $templ->{-main})
+    . $templ->toHTML($view->formatter, $templ->{-main})
     . "</TD></TR>\n</TABLE>\n";
 }
 
@@ -197,27 +203,26 @@ use strict;
 use PPresenter::Template::Default;
 use base 'PPresenter::Template::Default';
 
-use constant defaults =>
+use constant ObjDefaults =>
 { -name         => 'default slidenotes'
 , -aliases      => [ 'slidenotes', 'SlideNotes', 'sn' ]
 };
 
-sub prepareSlide($)
-{   my ($templ, $args) = @_;
+sub prepareParts($$)
+{   my ($templ, $slide, $view) = @_;
 
-    my $tbh  = $templ->toPercentage($templ->{-titlebarHeight});
-    my $t    = $tbh + $templ->toPercentage($templ->{-areaSeparation});
+    # overrules super prepareParts: no footer nor title required.
+    # $templ->SUPER::prepareParts($slide, $view);
 
-    unshift @{$templ->{-place}}, [ 0, 0, 1, 1, $templ->{-notes} ];
-
-    $templ->SUPER::prepareSlide($args);
+    $templ->addPart2Make( @{$view->decoration->notesBounds}
+        , $templ->{-notes}, 'notes' );
 }
 
 sub make_HTML_table($$)
-{   my ($templ, $args) = @_;
+{   my ($templ, $slide, $view) = @_;
 
     "<TABLE WIDTH=100%>\n<TR><TD VALIGN=top>"
-    . $templ->toHTML($args, $templ->{-notes})
+    . $templ->toHTML($view->formatter, $templ->{-notes})
     . "</TD></TR>\n</TABLE>\n";
 }
 
@@ -228,28 +233,22 @@ use strict;
 use PPresenter::Template::Default;
 use base 'PPresenter::Template::Default';
 
-use constant defaults =>
+use constant ObjDefaults =>
 { -name         => 'default title'
 , -aliases      => [ 'dt', 'title', 't' ]
 };
 
-sub prepareSlide($)
-{   my ($templ, $args) = @_;
-    my $view = $args->{view};
-
-    unshift @{$templ->{-place}}
-        , [ 0, 0,  1, $templ->toPercentage($templ->{-titlebarHeight})
-            , $view->formatter->titleFormat($view, $args->{slide}->getTitle)
-          ];
-
-    $templ->SUPER::prepareSlide($args);
+sub prepareParts($$)
+{   my ($templ, $slide, $view) = @_;
+    $templ->SUPER::prepareParts($slide, $view);
+    $templ->prepareTitle($slide, $view);
 }
 
 sub make_HTML_table($$)
-{   my ($templ, $args) = @_;
+{   my ($templ, $slide, $view) = @_;
 
     "<TABLE WIDTH=100%>\n<TR><TD ALIGN=center><H1>"
-    . $templ->toHTML($args, $args->{slide}->getTitle)
+    . $templ->toHTML($view->formatter, $slide->title)
     . "</H1></TD></TR>\n</TABLE>\n";
 }
 
@@ -260,7 +259,7 @@ use strict;
 use PPresenter::Template::Default;
 use base 'PPresenter::Template::Default';
 
-use constant defaults =>
+use constant ObjDefaults =>
 { -name         => 'default title left middle right'
 , -aliases      => [ 'dtlmr', 'title left middle right', 'tlmr',
                      'dtrml', 'title right middle left', 'trml',
@@ -270,36 +269,35 @@ use constant defaults =>
 , -right        => undef
 };
 
-sub prepareSlide($$$)
-{   my ($templ, $args) = @_;
+sub prepareParts($$)
+{   my ($templ, $slide, $view) = @_;
+    $templ->SUPER::prepareParts($slide, $view);
 
-    my $sep  = $templ->toPercentage($templ->{-areaSeparation});
-    my $colw = (1-2*$sep)/3;
-    my $tbh  = $templ->toPercentage($templ->{-titlebarHeight});
-    my $t    = $tbh + $sep;
-    my $view = $args->{view};
+    my $deco = $view->decoration;
 
-    unshift @{$templ->{-place}}
-        , [ 0, 0,        1, $tbh, $view->formatter->titleFormat
-                         ($view, $args->{slide}->getTitle) ]
-        , [ 0, $t,          $colw, 1-$t, $templ->{-left}   ]
-        , [ $colw+$sep, $t, $colw, 1-$t, $templ->{-middle} ]
-        , [ 1-$colw, $t,    $colw, 1-$t, $templ->{-right}  ];
+    my ($x0, $y0, $x1, $y1) = $deco->mainBounds($view, $templ->hasFooter);
 
-    $templ->SUPER::prepareSlide($args);
+    my $sepx = $deco->separationX($view);
+    my $colw = ($x1-$x0 - 2*$sepx)/3;
+
+    $templ->prepareTitle($slide, $view)
+          ->addPart2Make($x0, $y0, $x0+$colw, $y1, $templ->{-left}, 'main')
+          ->addPart2Make($x0+$colw+$sepx, $y0, $x0-$colw-$sepx, $y1
+            , $templ->{-middle}, 'main')
+          ->addPart2Make($x1-$colw, $y0, $x1, $y1, $templ->{-right}, 'main');
 }
 
 sub make_HTML_table($$)
-{   my ($templ, $args) = @_;
+{   my ($templ, $slide, $view) = @_;
 
     "<TABLE WIDTH=100%>\n<TR><TD VALIGN=top ALIGN=center COLSPAN=2><H1>"
-    . $templ->toHTML($args, $args->{slide}->getTitle)
+    . $templ->toHTML($view->formatter, $slide->title)
     . "</H1></TD></TR>\n<TR><TD VALIGN=top WIDTH=33%>"
-    . $templ->toHTML($args, $templ->{-left})
+    . $templ->toHTML($view->formatter, $templ->{-left})
     . "</TD><TD VALIGN=top WIDTH=33%>"
-    . $templ->toHTML($args, $templ->{-middle})
+    . $templ->toHTML($view->formatter, $templ->{-middle})
     . "</TD><TD VALIGN=top WIDTH=33%>"
-    . $templ->toHTML($args, $templ->{-right})
+    . $templ->toHTML($view->formatter, $templ->{-right})
     . "</TD></TR>\n</TABLE>\n";
 }
 
@@ -311,7 +309,7 @@ use strict;
 use PPresenter::Template::Default;
 use base 'PPresenter::Template::Default';
 
-use constant defaults =>
+use constant ObjDefaults =>
 { -name         => 'default title left right'
 , -aliases      => [ 'dtlr', 'title left right', 'tlr',
                      'dtrl', 'title right left', 'trl',
@@ -320,37 +318,32 @@ use constant defaults =>
 , -right        => undef
 };
 
-sub prepareSlide($$$)
-{   my ($templ, $args) = @_;
+sub prepareParts($$)
+{   my ($templ, $slide, $view) = @_;
+    $templ->SUPER::prepareParts($slide, $view);
 
-    my $sep  = $templ->toPercentage($templ->{-areaSeparation});
-    my $colw = (1-$sep)/2;
-    my $tbh  = $templ->toPercentage($templ->{-titlebarHeight});
-    my $t    = $tbh + $sep;
-    my $view = $args->{view};
+    my $deco = $view->decoration;
+    my ($x0, $y0, $x1, $y1) = $deco->mainBounds($view, $templ->hasFooter);
+    my $colw = ($x1-$x0 - $deco->separationX($view))/2;
 
-    unshift @{$templ->{-place}}
-        , [ 0, 0,        1, $tbh, $view->formatter->titleFormat
-                      ($view, $args->{slide}->getTitle) ]
-        , [ 0, $t,       $colw, 1-$t, $templ->{-left}   ]
-        , [ 1-$colw, $t, $colw, 1-$t, $templ->{-right}  ];
-
-    $templ->SUPER::prepareSlide($args);
+    $templ->prepareTitle($slide, $view)
+          ->addPart2Make($x0, $y0, $x0+$colw, $y1, $templ->{-left} , 'main')
+          ->addPart2Make($x1-$colw, $y0, $x1, $y1, $templ->{-right}, 'main');
 }
 
 sub make_HTML_table($$)
-{   my ($templ, $args) = @_;
+{   my ($templ, $slide, $view) = @_;
+
+    my $formatter = $view->formatter;
 
     "<TABLE WIDTH=100%>\n<TR><TD VALIGN=top COLSPAN=2><H1>"
-    . $templ->toHTML($args, $args->{slide}->getTitle)
+    . $templ->toHTML($formatter, $slide->title)
     . "</H1></TD></TR>\n<TR><TD VALIGN=top WIDTH=50%>"
-    . $templ->toHTML($args, $templ->{-left})
+    . $templ->toHTML($formatter, $templ->{-left})
     . "</TD><TD ALIGN=center WIDTH=50%>"
-    . $templ->toHTML($args, $templ->{-right})
+    . $templ->toHTML($formatter, $templ->{-right})
     . "</TD></TR>\n</TABLE>\n";
 }
-
-
 
 package PPresenter::Template::Default::TitleMain;
 
@@ -358,34 +351,30 @@ use strict;
 use PPresenter::Template::Default;
 use base 'PPresenter::Template::Default';
 
-use constant defaults =>
+use constant ObjDefaults =>
 { -name         => 'default title main'
 , -aliases      => [ 'dtm', 'title main', 'tm', 'default' ]
 , -main         => undef
 };
 
-sub prepareSlide($)
-{   my ($templ, $args) = @_;
+sub prepareParts($$)
+{   my ($templ, $slide, $view) = @_;
+    $templ->SUPER::prepareParts($slide, $view);
 
-    my $tbh  = $templ->toPercentage($templ->{-titlebarHeight});
-    my $t    = $tbh + $templ->toPercentage($templ->{-areaSeparation});
-    my $view = $args->{view};
-
-    unshift @{$templ->{-place}}
-        , [ 0, 0,       1, $tbh, $view->formatter->titleFormat
-                    ($view, $args->{slide}->getTitle) ]
-        , [ 0, $t,      1, 1-$t,    $templ->{-main}   ];
-
-    $templ->SUPER::prepareSlide($args);
+    $templ->prepareTitle($slide, $view)
+          ->addPart2Make
+            ( $view->decoration->mainBounds($view, $templ->hasFooter)
+            , $templ->{-main}, 'main'
+            );
 }
 
 sub make_HTML_table($$)
-{   my ($templ, $args) = @_;
+{   my ($templ, $slide, $view) = @_;
 
     "<TABLE WIDTH=100%>\n<TR><TD ALIGN=center><H1>"
-    . $templ->toHTML($args, $args->{slide}->getTitle)
+    . $templ->toHTML($view->formatter, $slide->title)
     . "</H1></TD></TR>\n<TR><TD VALIGN=top>"
-    . $templ->toHTML($args, $templ->{-main})
+    . $templ->toHTML($view->formatter, $templ->{-main})
     . "</TD></TR>\n</TABLE>\n";
 }
 

@@ -1,4 +1,5 @@
 #!/usr/local/bin/perl -w
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 use lib '..';
 use PPresenter;

@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 package PPresenter::Fontset::XScaling;
 
@@ -10,7 +10,7 @@ use base 'PPresenter::Fontset';
 # Used while initializing.
 #
 
-use constant defaults =>
+use constant ObjDefaults =>
 { -name             => 'xscaling'               # required
 , -aliases          => [ 'scaling', 'scale', 'X' ]
 , -fixedFont        => 'adobe-courier'
@@ -66,7 +66,7 @@ sub getXScalingInfo($)
     $fontset;
 }
 
-sub getFont($$$$)
+sub font($$$$)
 {   my ($fontset, $viewport, $type, $weight, $slant, $size) = @_;
     #  type     : PROPORTIONAL, FIXED or X11-like  fndry-fam
     #  weight   : bold, normal

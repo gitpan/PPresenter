@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 # Viewport
 #
@@ -13,7 +13,7 @@ use base 'PPresenter::Object';
 
 use Tk;
 
-use constant defaults =>
+use constant ObjDefaults =>
 { -name               => 'default'
 , -aliases            => undef
 
@@ -60,19 +60,18 @@ sub InitObject()
     $viewport;
 }
 
-sub getGeometry() {$_[0]->{-geometry}}
-sub getScreen()   {$_[0]->{screen}}
-sub getCanvas()   {$_[0]->{playfield}}
-sub getStyle()    {$_[0]->{selected_style}}
-sub getDevice()   {$_[0]->{-device}}
-sub getDisplay()  {$_[0]->{-display}}
-sub getScreenId() {$_[0]->{screen}->id}
-sub getCanvasId() {$_[0]->{playfield}->id}
+sub geometry() {$_[0]->{-geometry}}
+sub screen()   {$_[0]->{screen}}
+sub canvas()   {$_[0]->{playfield}}
+sub style()    {$_[0]->{selected_style}}
+sub device()   {$_[0]->{-device}}
+sub display()  {$_[0]->{-display}}
+sub screenId() {$_[0]->{screen}->id}
+sub canvasId() {$_[0]->{playfield}->id}
 
-sub iconify()     {$_[0]->{screen}->iconify}
-sub withdraw()    {$_[0]->{screen}->withdraw}
-sub raise(@)      {shift->{screen}->raise(@_)}
-sub sync(@)       {shift->{screen}->update(@_)}
+sub iconify()  {$_[0]->{screen}->iconify; shift}
+sub withdraw() {$_[0]->{screen}->withdraw; shift}
+sub sync()     {$_[0]->{screen}->update; shift}
 
 #
 # Selections
@@ -99,17 +98,17 @@ sub find($$)
     $viewport->{selected_style}->find($type, $name)
 }
 
-sub getStyleElems($)
+sub styleElems($)
 {   my ($viewport, $slide, $flags) = @_;
     my $style = exists $flags->{style}
               ? $viewport->{show}->find(style => $flags->{style})
               : $viewport->{selected_style};
-    $style->getStyleElems($slide, $flags);
+    $style->styleElems($slide, $flags);
 }
 
-sub getFont(@)
+sub font(@)
 {   my $viewport = shift;
-    $viewport->find(fontset => 'SELECTED')->getFont($viewport, @_);
+    $viewport->find(fontset => 'SELECTED')->font($viewport, @_);
 }
 
 #
@@ -119,7 +118,7 @@ sub getFont(@)
 sub setSlide($$)
 {   my ($viewport,$slide,$newtag) = @_;
     my $tag = $viewport->{current_tag};
-    $viewport->getCanvas->delete($tag) if defined $tag;
+    $viewport->canvas->delete($tag) if defined $tag;
     $viewport->{current_slide} = $slide;
     $viewport->{current_tag}   = $newtag;
 }
@@ -132,7 +131,7 @@ sub packViewport(;)
 sub showSlideNotes    {$_[0]->{-showSlideNotes}}
 sub hasControl        { 0 }
 
-sub getBackgroundId() {$_[0]->{background_id}}
+sub backgroundId()    {$_[0]->{background_id}}
 sub setBackgroundId() {$_[0]->{background_id} = $_[1]}
 
 #
@@ -160,7 +159,7 @@ sub nextProgramPhase($)   {$_[0]->{program}->nextPhase}
 # Geometry
 #
 
-sub getCanvasDimensions()
+sub canvasDimensions()
 {   my $canvas = shift->{playfield};
     ($canvas->width, $canvas->height);
 }
@@ -169,7 +168,7 @@ sub screenMessures()
 {   my $viewport = shift;
 
     unless(defined $viewport->{width})
-    {   my $screen = $viewport->getScreen;
+    {   my $screen = $viewport->screen;
         @$viewport{'width','height'} = ($screen->width, $screen->height);
     }
 
@@ -194,7 +193,7 @@ sub findClosestsGeometry($@;)
     return $prefer;
 }
 
-sub getGeometryScaling($;$)    # args is (geometry) or (width,height)
+sub geometryScaling($;$)    # args is (geometry) or (width,height)
 {   my $viewport = shift;
     my ($w, $h)  = (@_ == 1 ? $_[0] =~ m/(\d+)x(\d+)/ : @_);
  
@@ -203,6 +202,6 @@ sub getGeometryScaling($;$)    # args is (geometry) or (width,height)
     return sqrt($twodim);
 }
 
-sub Photo(@) {shift->getCanvas->Photo(@_)}
+sub Photo(@) {shift->canvas->Photo(@_)}
 
 1;

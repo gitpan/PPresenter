@@ -1,10 +1,10 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 package PPresenter::tkTimerLabel;
 
 use strict;
-use Tk::Label;
 use Tk::Derived;
+use Tk::Label;
 use base qw(Tk::Derived Tk::Label);
 
 Construct Tk::Widget 'TimerLabel';

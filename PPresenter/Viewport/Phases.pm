@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 # PPresenter::Viewport::Phases with sub-classes.
 
@@ -12,7 +12,7 @@ sub new($$)
     bless {diameter => $diameter, color => $color}, $class;
 }
 
-sub getDimensions($)
+sub dimensions($)
 {   my $diameter = shift->{diameter};
     ($diameter, $diameter);
 }
@@ -78,9 +78,9 @@ sub new($$)
     bless {image => $image, color => $color}, $class;
 }
 
-sub getDimensions($)
+sub dimensions($)
 {   my ($self, $viewport) = @_;
-    $self->{image}->getDimensions($viewport);
+    $self->{image}->dimensions($viewport);
 }
 
 sub put($$$$)
@@ -109,14 +109,12 @@ use Tk;
 sub new($$)
 {   my ($class, $show, $viewport) = @_;
 
-    my $canvas = $viewport->getCanvas;
+    my $canvas = $viewport->canvas;
     my $self   = bless
     { viewport   => $viewport
     , canvas     => $canvas
+    , show       => $show
     }, $class;
-
-    my $symbol = $self->initSymbol($show, $viewport->{-phaseSymbol});
-    $self->{symbol}    = $symbol;
 
     $self->{horizontal} = $viewport->{-phaseDirection} eq 'horizontal' ? 1
                         : $viewport->{-phaseDirection} eq 'vertical'   ? 0
@@ -132,11 +130,17 @@ sub new($$)
 sub setPhase($$)
 {   my ($self, $phase, $nr_phases) = @_;
 
+    my ($canvas, $viewport) = @$self{qw/canvas viewport/};
+
+    my $symbol = $self->{symbol};
+    $self->{symbol} = $symbol
+        = $self->initSymbol($self->{show}, $viewport->{-phaseSymbol})
+             unless defined $symbol;
+
     $self->{locations} = $self->getLocations($self->{symbol})
-            unless defined $self->{locations};
+        unless defined $self->{locations};
 
     my $required = $nr_phases - $phase;
-    my ($symbol, $canvas, $viewport) = @$self{qw/symbol canvas viewport/};
 
     foreach (0..9)
     {   if($_ < $required)
@@ -180,8 +184,8 @@ sub initSymbol($)
 sub getLocations($$)
 {   my ($self, $symbol) = @_;
     my $viewport     = $self->{viewport};
-    my ($sw, $sh)    = $symbol->getDimensions($viewport);
-    my ($cw, $ch)    = $viewport->getCanvasDimensions;
+    my ($sw, $sh)    = $symbol->dimensions($viewport);
+    my ($cw, $ch)    = $viewport->canvasDimensions;
     my ($top, $left) = ($self->{vstart} eq 'n', $self->{hstart} eq 'w');
 
     my @locs;

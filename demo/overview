@@ -1,21 +1,11 @@
 #!/usr/bin/perl -w
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 #
 # This file is overly complicated to demonstrate some of the possibilities.
 # Experiment a bit with (un-)commenting option lines.
 
 use lib '..';
 use strict;
-
-# Warning to make people aware on the danger of running downloaded
-# presentations.  Of course, the demo files included in the package
-# are used by many and safe.
-
-print "Are you aware that a PPresenter program may contain dangerous code?
-Do never execute PPresenter files with doubtfull origin.
-Do you understand this (no/yes) [no] ? ";
-
-exit 0 if <STDIN> ne "yes\n";
 
 #
 # Start of the program.
@@ -56,7 +46,7 @@ $show->select(formatter => 'markup')->addLogical(EMAIL => 'TT B');
 #print $show->find('style')->tree,"\n";
 
 #$show->change
-#   ( 'template', 'ALL'
+#   ( template => 'ALL'
 #   , -showTemplateOutlines => 1     # black lines to see how screen is devided
 #   );
 

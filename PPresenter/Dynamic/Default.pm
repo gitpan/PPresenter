@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 package PPresenter::Dynamic::Default;
 
@@ -8,7 +8,7 @@ use base 'PPresenter::Dynamic';
 
 use Tk;
 
-use constant defaults =>
+use constant ObjDefaults =>
 { -name           => 'default'
 , -aliases        => undef
 , -appearTime     => 5
@@ -29,7 +29,7 @@ sub start_visible()
 }
 
 sub parse($$$$)
-{   my ($dynamic, $program, $slide, $tag, $string) = @_;
+{   my ($dynamic, $program, $slide, $affected, $string) = @_;
 
     $string = $dynamic->{-appear} unless $string;
 
@@ -51,19 +51,19 @@ sub parse($$$$)
     { after   => $after   || 0
     , move    => $appear  || $move || undef
     , movesec => $movesec || $dynamic->{-appearTime}
-    , tag     => $tag
+    , affected=> $affected
     , string  => $string
     , slide   => $slide
     };
 
     @$cmd{'dir_y','dir_x'} = $dynamic->directions($string, $movedir||'');
 
-    $_ = defined $phase ? $phase : 0;
+    local $_ = defined $phase ? $phase : 0;
 
     if( my ($go) = /^(\d+)\-?$/ )
     {   $cmd->{phase} = $go;
         $cmd->{move}  = 'appear' unless defined $cmd->{move};
-        $dynamic->parse($program, $slide, $tag, 'phase 0 appear')
+        $dynamic->parse($program, $slide, $affected, 'phase 0 appear')
             if $cmd->start_visible;
 
         $program->add($go, $cmd);
@@ -71,7 +71,7 @@ sub parse($$$$)
     elsif( ($go) = m/^\-(\d+)$/ )
     {   $cmd->{move}  = 'disappear' unless defined $cmd->{move};
         if($cmd->start_visible)
-        {   $dynamic->parse($program, $slide, $tag, 'phase 0 appear');
+        {   $dynamic->parse($program, $slide, $affected, 'phase 0 appear');
             $cmd->{phase} = ++$go;
             $program->add($go, $cmd);
         }
@@ -83,6 +83,7 @@ sub parse($$$$)
         $cmd->{phase} = $come;
         $cmd->{move}  = 'appear';
         $program->add($come, $cmd);
+        $cmd = bless { %$cmd };  #copy;
         $cmd->{phase} = ++$go;
         $cmd->{move}  = 'disappear';
         $program->add($go, $cmd);
@@ -108,7 +109,12 @@ sub start($$$)
 sub make_start($$)
 {   my ($cmd, $canvas, $displace_x) = @_;
 
-    my ($move, $tag) = @$cmd{'move', 'tag'};
+    my ($move, $affected) = @$cmd{'move', 'affected'};
+
+    return $affected->Call
+        if $affected->isa('Tk::Callback');
+
+    my $tag = $affected;
 
     return $canvas->move($tag, -$displace_x, 0)
         if $move eq 'appear';
@@ -152,7 +158,7 @@ sub make_start($$)
 
 sub linear_move($$)
 {   my ($cmd, $canvas) = @_;
-    return if $cmd->{end_x}==$cmd->{cur_x};
+    return if $cmd->{end_x}==$cmd->{cur_x} && $cmd->{end_y}==$cmd->{cur_y};
 
     use Tk;
     my $progress = $cmd->{movesec} < 0.01 ? 2
@@ -170,7 +176,7 @@ sub linear_move($$)
     $canvas->after(10, [ \&linear_move, $cmd, $canvas ] );
     return unless $dx || $dy;
 
-    $canvas->move($cmd->{tag}, $dx, $dy);
+    $canvas->move($cmd->{affected}, $dx, $dy);
     $cmd->{cur_x} += $dx;
     $cmd->{cur_y} += $dy;
 }
@@ -184,7 +190,7 @@ sub flushMove($$)
     my $dy = $cmd->{end_y} - $cmd->{cur_y};
     return unless $dx || $dy;   # already at the end?
 
-    $canvas->move($cmd->{tag}, $dx, $dy);
+    $canvas->move($cmd->{affected}, $dx, $dy);
     @$cmd{'cur_x', 'cur_y'} = @$cmd{'end_x', 'end_y'};
 }
 

@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 # SHOW
 #
@@ -9,6 +9,8 @@
 package PPresenter::Show;
 
 use strict;
+use Carp;
+
 use PPresenter::Object;
 use base 'PPresenter::Object';
 
@@ -18,7 +20,7 @@ use PPresenter::Slide;
 use PPresenter::StyleElem;
 use PPresenter::Images;
 
-use constant defaults =>
+use constant ObjDefaults =>
 { -name               => 'Gnu/Portable Presenter'
 , -aliases            => undef
 
@@ -39,6 +41,7 @@ use constant defaults =>
 , -totaltime          => undef
 , -tags               => undef   # initial selection of sites.
 , -flushPhases        => 0
+, -enableCallbacks    => 1
 , -clockTics          => 1.0
 , -halted             => 1
 };
@@ -52,7 +55,7 @@ sub InitObject(@)
     $SIG{INT} = $SIG{QUIT} = $SIG{TERM} = sub {exit};
 
     my $tracefile = $show->{-trace};
-    open(Presenter::TRACE, ">$tracefile")
+    open (PPresenter::TRACE, ">$tracefile")
         or die "Unable to open file $tracefile for trace.\n";
 
     $show->{slides}    = [];
@@ -118,7 +121,8 @@ sub find($;$)
 
     $name = 'SELECTED' unless defined $name;
 
-    my $object = $type eq 'slide'    ? $show->find_slide($name)
+    my $object = $type eq 'main'     ? $show
+               : $type eq 'slide'    ? $show->find_slide($name)
                : $type eq 'viewport' ? $show->find_viewport($name)
                : $type eq 'style'    ? $show->find_style($name)
                : $type eq 'image'    ? $show->{images}->findImage($name)
@@ -221,7 +225,7 @@ sub addViewport(@)
                ? PPresenter::Viewport::Control->new(%$proto, show => $show)
                : PPresenter::Viewport->new(%$proto, show => $show);
 
-    print Presenter::TRACE "Defined viewport $screen.\n";
+    print PPresenter::TRACE "Defined viewport $screen.\n";
 
     push @{$show->{viewports}}, $screen;
     $screen;
@@ -260,10 +264,10 @@ sub change_viewport($@)
     $viewport->change(@_);
 }
 
-sub showSlideControl()   {$_[0]->{control}->showSlideControl}
-sub updateSlideControl() {$_[0]->{control}->updateSlides    }
-sub IconifyControl()     {$_[0]->{control}->iconify         }
-sub getViewports()       {@{$_[0]->{viewports}}             }
+sub showSlideControl()   {$_[0]->{control}->showControl }
+sub updateSlideControl() {$_[0]->{control}->updateSlides}
+sub iconifyControl()     {$_[0]->{control}->iconify     }
+sub viewports()          {@{$_[0]->{viewports}}         }
 
 sub initViewports()
 {   my $show = shift;
@@ -364,7 +368,7 @@ sub addSlide(@)
 
 sub includeShow($)
 {   my ($show, $show2) = @_;
-    $show->addSlide($show2->getSlides);
+    $show->addSlide($show2->slides);
 }
 
 sub find_slide($)
@@ -374,23 +378,25 @@ sub find_slide($)
     PPresenter::Slide->fromList($show->{slides}, $name);
 }
 
-sub getSlides()       { @{$_[0]->{slides}} }
-sub getActiveSlides() { grep {$_->isActive} @{$_[0]->{slides}} }
-sub getNumberSlides() { scalar @{$_[0]->{slides}} }
+sub slides()       { @{shift->{slides}} }
+sub activeSlides() { grep {$_->isActive} @{shift->{slides}} }
+sub numberSlides() { scalar @{shift->{slides}} }
+sub current()      { shift->{current_slide} }
 
 sub containsSlideNotes()
 {   my $show = shift;
-    foreach ($show->getSlides)
+    foreach ($show->slides)
     {   return 1 if $_->hasSlideNotes;
     }
     return 0;
 }
+
 #
 # Program
 #
 
-sub mustFlushPhases()      { $_[0]->{-flushPhases} }
-sub flushPhases()          { $_[0]->addPhase(9)    }
+sub mustFlushPhases()      { shift->{-flushPhases} }
+sub flushPhases()          { shift->addPhase(9)    }
 sub updatePhaseSymbols($$) { shift->{control}->setPhase(@_) }
 
 sub addPhase($)
@@ -398,7 +404,6 @@ sub addPhase($)
     $show->{current_slide}->nextPhase while $count-- > 0;
 }
 
-   
 sub nextSelected($;)
 {   my $show = shift;
     my $current = $show->{current_slide};
@@ -418,7 +423,7 @@ sub previousSelected()
     my $current = $show->{current_slide};
 
     while(defined $current)
-    {   $current = $show->find_slide($current->getNumber -1);
+    {   $current = $show->find_slide($current->number -1);
         return $current if defined $current && $current->isActive;
     }
 
@@ -492,20 +497,14 @@ sub showSlide($)
 
     # Show new slide.
 
-    my $control = $show->{control};
+    $show->busy(1);
+    $next_slide->prepare->show;
+    $show->busy(0);
 
-    $control->busy(1);
-
-    $next_slide->prepare;
-    $next_slide->show;
-
-    $control->busy(0);
-
-    $show->{current_slide} = $next_slide;
+    $show->{current_slide}        = $next_slide;
     $show->{current_slide_number} = $next_slide->{number};
 
-    $control->update($show, $next_slide);
-    $control->sync;
+    $show->{control}->update($show, $next_slide)->sync;
     $next_slide->startProgram($show);
 }
 
@@ -540,7 +539,7 @@ sub run()
     my $not_active= 0;
 
     foreach (@$slides)
-    {   if($_->isActive) { $sumtime += $_->getRequiredTime }
+    {   if($_->isActive) { $sumtime += $_->requiredTime }
         else             { $not_active++ }
     }
 
@@ -556,10 +555,15 @@ sub run()
              int($load*100-100), "% too much)\n";
     }
     elsif($sumtime < $totaltime)
-    {   my $load = $sumtime/$totaltime;
-        print "You have ", $totaltime - $sumtime,
-          " seconds to spare on the ", @$slides-$not_active, " slides",
-              " (", 100-int($load*100), "% too short)\n";
+    {   my $load  = $sumtime/$totaltime;
+        my $spare = $totaltime - $sumtime;
+        $spare    = $spare > 180
+                  ? int($spare/60 + .5)." minutes"
+                  : $spare." seconds";
+
+        print "You have $spare spare on the "
+            , @$slides-$not_active, " slides"
+            , " (", 100-int($load*100), "% too short)\n";
     }
 
     print +($not_active==1 ? "One slide is" : "$not_active slides are"),
@@ -577,7 +581,7 @@ sub run()
     # Schedule to start the show.
 
     $show->{runtime} = 0;
-    my $ascreen = $show->{control}->getScreen;
+    my $ascreen = $show->{control}->screen;
     $ascreen->after(100, [ \&start, $show ] );
 
     use Tk;
@@ -599,7 +603,7 @@ sub start
 {   my $show = shift;
 
     # When realization is slow, we have to wait for it.
-    my $ascreen = $show->{control}->getScreen;
+    my $ascreen = $show->{control}->screen;
     $ascreen->after(100) until $ascreen->width > 1;
 
     $show->showSlide($show->{-startSlide});
@@ -642,8 +646,8 @@ sub countSelectedTags()
     my (%count, %set, %clear);
 
     foreach (@{$show->{slides}})
-    {   if($_->isActive) {map {$set{$_}++;   $count{$_}++} $_->getTags}
-        else             {map {$clear{$_}++; $count{$_}++} $_->getTags}
+    {   if($_->isActive) {map {$set{$_}++;   $count{$_}++} $_->tags}
+        else             {map {$clear{$_}++; $count{$_}++} $_->tags}
     }
 
     map { [ $_, $count{$_}, $set{$_}||0, $clear{$_}||0 ] }
@@ -651,6 +655,7 @@ sub countSelectedTags()
 }
 
 sub slideSelectionChanged() {shift->{control}->slideSelectionChanged}
+sub busy($)   {my ($show, $busy) = @_; $show->{control}->busy($busy)}
 
 #
 # TickTac
@@ -683,10 +688,16 @@ sub setRunning($)
     my $status = $show->{-halted}
                ? 'halted'
                : $show->{runtime} > 0 ? 'continues' : 'started';
-    print $show->timeStamp,": running $status.\n";
+    print $show->timeStamp,": run $status.\n";
 }
 
 sub setProceedAfter($) {$_[0]->{proceed_after} = $_[1]}
+sub enableCallbacks()
+{   my $show = shift;
+    my $old  = $show->{-enableCallbacks};
+    $show->{-enableCallbacks} = shift if @_;
+    $old;
+}
 
 sub minSecs($)
 {   my $secs = int $_[1];
@@ -738,21 +749,17 @@ sub time2secs($)
 # Images
 #
 
-sub image(@)           {shift->{images}->image(@_)}
-sub getImageSizeBase() {shift->{-imageSizeBase}}
-sub resizeImages()     {shift->{-resizeImages}}
-sub enlargeImages()    {shift->{-enlargeImages}}
-sub addImageDir(@)     {shift->{images}->addImageDir(@_)}
-sub Photo(@)           {shift->{selected_viewport}->Photo(@_)}
-sub findImageFile(@)   {shift->{images}->findImageFile(@_)}
-
-sub printSlide()
-{   my $show = shift;
-    $show->{current_slide}->print;
-}
+sub image(@)         {shift->{images}->image(@_)}
+sub imageSizeBase()  {shift->{-imageSizeBase}}
+sub resizeImages()   {shift->{-resizeImages}}
+sub enlargeImages()  {shift->{-enlargeImages}}
+sub addImageDir(@)   {shift->{images}->addImageDir(@_)}
+sub Photo(@)         {shift->{selected_viewport}->Photo(@_)}
+sub findImageFile(@) {shift->{images}->findImageFile(@_)}
+sub printSlide()     {shift->{current_slide}->print }
 
 #
-# Exporters
+# Bootstrapping Exporters
 #
 
 sub addExporter($@)
@@ -761,7 +768,7 @@ sub addExporter($@)
     if(ref $name eq '')
     {   eval "require $name";
         if($@)
-        {   warn "Cannot find export $name: $@.\n";
+        {   croak "Cannot use export $name: $@.\n";
             return undef;
         }
 
@@ -771,21 +778,21 @@ sub addExporter($@)
             unless $exporter->isa('PPresenter::Export');
 
         push @{$show->{exporters}}, $exporter;
-        print Presenter::TRACE "Loaded exporter $exporter.\n";
+        print PPresenter::TRACE "Loaded exporter $exporter.\n";
         return $exporter;
     }
 
     if($name->isa('PPresenter::Exporter'))
     {   push @{$show->{exporters}}, $name->change(@_);
-        print Presenter::TRACE "Added exporter $name.\n";
+        print PPresenter::TRACE "Added exporter $name.\n";
         return $name;
     }
 
-    warn "addExporter expects a module-name.\n";
+    warn "WARNING: addExporter expects a module-name.\n";
     return undef;
 }
 
-sub getExporters() {@{$_[0]->{exporters}}}
+sub exporters() {@{shift->{exporters}}}
 
 my $image_magick_installed;
 
@@ -807,4 +814,14 @@ sub runsOnX()
     exists $ENV{DISPLAY};
 }
 
+#
+# Decorations
+#
+
+sub decodata($)   # maintains decoration information over slide-bounds.
+{   my ($show, $view) = @_;
+    my $label = 'deco_'.$view->viewport;
+    exists $show->{$label} ? $show->{$label} : ($show->{$label} = {});
+}
+ 
 1;

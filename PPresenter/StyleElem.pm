@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 #
 # Style-Elements
 #
@@ -9,7 +9,7 @@ use strict;
 use PPresenter::Object;
 use base 'PPresenter::Object';
 
-use constant defaults =>
+use constant ObjDefaults =>
 { style => undef
 , show  => undef
 };
@@ -36,11 +36,11 @@ sub load($;@)
     if(defined @{"${class}::INCLUDES"})
     {   my @expanded = @{"${class}::INCLUDES"};
 #       local $" = "\n    ";
-#       print Presenter::TRACE "  $class contains\n    @expanded\n";
+#       print PPresenter::TRACE "  $class contains\n    @expanded\n";
         return map {load($_, @args)} @expanded;
     }
 
-    print Presenter::TRACE "  Loading $class.\n";
+    print PPresenter::TRACE "  Loading $class.\n";
     $class->new(@args);
 }
 

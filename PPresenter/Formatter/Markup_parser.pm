@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 package PPresenter::Formatter::Markup_parser::Command;
 
@@ -22,16 +22,15 @@ sub parse_command($$)
 {   my ($self, $statement) = @_;
 
     my ($cmd)  = $statement =~ m!^\s*([/\w]+)\s*!;
-    my ($realcmd, $paramlist) = command_translate($self, $cmd, $');
+    my ($realcmd, $paramlist) = command_translate($self, uc $cmd, $');
     my $params = bless {cmd=>uc $cmd, CMD => uc $realcmd}
         , 'PPresenter::Formatter::Markup_parser::Command';
 
-    while(my ($name, $content) =
-        $paramlist =~ m/\s*(\w+)(?:\=("[^"]*"|\S+))?/)
-    {   $content = '1' unless defined $content;
+    while(my ($name, undef, $content, undef, $qcontent) =
+        $paramlist =~ m/\s*(\w+)(=((["'])([^\4]*?)\4|\S+))?/)
+    {   $content = $qcontent if defined $qcontent;
+	$content = '1' unless defined $content;
         $paramlist = $';
-        $content =~ s/^"//;
-        $content =~ s/"$//;
         $params->{uc $name} = $content;
     }
 
@@ -44,8 +43,8 @@ sub parse_command($$)
 # The result is a nested tree where each level is:
 #       "string", [ compound ], "string", [ compound ], ..., "string"
 
-sub parse($)
-{   my ($self, $text) = @_;
+sub parse($$$)
+{   my ($self, $slide, $view, $text) = @_;
 
     return [] unless defined $text;
 

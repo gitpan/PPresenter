@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 package PPresenter::Style;
 
@@ -9,7 +9,7 @@ use base 'PPresenter::StyleElem';
 my @style_elements = qw(template fontset dynamic decoration formatter);
 sub objtype($;) {ucfirst $_[0]}
 
-use constant defaults =>
+use constant ObjDefaults =>
 { type         => 'style'
 
 , -templates   => [ 'PPresenter::Template::Default' ]
@@ -19,13 +19,14 @@ use constant defaults =>
 , -formatters  => [ 'PPresenter::Formatter::Plain'
                   , 'PPresenter::Formatter::Simple'
                   , 'PPresenter::Formatter::Markup' ]
-, -decorations => [ 'PPresenter::Decoration::Solid' ]
+, -decorations => [ 'PPresenter::Decoration::Solid'
+                  , 'PPresenter::Decoration::Lines1' ]
 };
 
 sub InitObject()
 {   my $style = shift;
 
-    print Presenter::TRACE "Creating style $style.\n";
+    print PPresenter::TRACE "Creating style $style.\n";
     $style->SUPER::InitObject;
 
     # Get all the modules.
@@ -47,7 +48,7 @@ sub InitObject()
 
     map {$style->select($_, 'FIRST')} @style_elements;
 
-    print Presenter::TRACE "Initialized style $style.\n";
+    print PPresenter::TRACE "Initialized style $style.\n";
 }
 
 #
@@ -107,7 +108,7 @@ sub add($$)
     }
 
     unshift @{$style->{$list}}, $element;
-    print Presenter::TRACE "Added $type $element.\n";
+    print PPresenter::TRACE "Added $type $element.\n";
 
     return $style;
 }
@@ -195,7 +196,7 @@ WARN
 # Collecting style elements.
 #
 
-sub getStyleFlags($)
+sub styleFlags($)
 {   my $options = shift;
     my %flags;
 
@@ -207,7 +208,7 @@ sub getStyleFlags($)
     return \%flags;
 }
 
-sub getStyleElems($)
+sub styleElems($)
 {   my ($style, $slide, $flags) = @_;
     my %elems;
 

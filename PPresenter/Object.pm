@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 # I would have liked to call this package UNIVERSAL, but then it
 # is also a base-class of Tk objects.  This doesn't work well
@@ -30,7 +30,7 @@ sub getOptions($)
 
     map {$self->getOptions($_)}  @{"${class}::ISA"};
 
-    my $get_defaults = *{"${class}::defaults"}{CODE} || undef;
+    my $get_defaults = *{"${class}::ObjDefaults"}{CODE} || undef;
     return $self unless defined $get_defaults;
 
     my $defaults     = &$get_defaults;
@@ -182,6 +182,7 @@ sub nested_types($$)
                     , map {nested_types($_, "$indent   ")} @{"${type}::ISA"};
 }
 
+sub show_scalar_line($$);
 sub show_scalar_line($$)
 {   my ($scalar, $max) = @_;
     return "undef" unless defined $scalar;
@@ -215,6 +216,7 @@ sub show_scalar_line($$)
     }
 }
 
+sub show_scalar_block($$);
 sub show_scalar_block($$)
 {  my ($scalar, $indent) = @_;
 

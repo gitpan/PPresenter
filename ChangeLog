@@ -1,3 +1,51 @@
+v1.10
+* Excellent logo by Phil Regnauld <regnauld@ftf.net>
+* Renamed Presenter::TRACE into the correct PPresenter::TRACE.
+* Added -exportPhases (Dynamic)
+* Added -callbacks (Slide)
+* Added -enableCallbacks (show->new)
+* Redesigned the way that slides can be exported on the lower level.
+  Interfaces to website creation and image-production changed only
+  very little.
+* Changed Export::Website into Export::Website::HTML to give some namespace
+  to new formats, such as XML.
+* Change interface to some of the functions in Export::Website::HTML such that
+  more than one phase of the same slide can be included in website.
+* Changed Export::IM_Images into Export::Images::ImageMagick.
+* Fixed slide-exports to images.
+
+v1.07
+Thanks to Johan Vromans <jvromans@squirrel.nl>:
+* PPresenter/Dynamic/Default.pm: Strict vertical moves (to/from s and
+  to/from n) did not work.
+* PPresenter/Formatter/Markup_parser.pm: Logical markups are not
+  matched case-insensitive.
+* PPresenter/Formatter/Markup_parser.pm: Allow attribute values to be
+  placed between single quotes as well as double quotes.
+* Miscelleneous fixes for Perl 5.6 (5.5.670beta)
+  Mostly eliminate warnings for 'use constant defaults' and defined
+  (@array) tests.
+
+Other changes:
+* Changes all functions getXyzAbc() into xyzAbc() to improve abstraction.
+  Bad idea about `get' in names was taken from Java, but only troubles
+  the readability.
+* Implemented complex decoration, including page footers.
+* changed implementation of templates to work with new decoration
+  techniques.
+* Renamed doc to doc_html
+* Created bin/present which can start *.ppr and *.xml files.
+* Created doc_pod/present.pod for present.1
+* Place-holders for PPresenter::Import::XML and PPresenter::Import::MagicPoint,
+  which will implement translations between those two formats and PPresenter.
+* Resizing images with Image::Magick does not work properly on the
+  border of transparent and normal pixels.  Also, conversion from an
+  Image::Magick pixels to a tkPhoto does not work properly.  Created a
+  work-around to create nicer results.
+* Added Markup tags FOOTER (markup for footer-texts), N (switch to normal
+  font), and PROP (select proportional font).
+* Added callbacks for slides, which are code-hooks into the display process
+  of a slide.
 
 v1.00
 Thanks to Slaven Rezic:

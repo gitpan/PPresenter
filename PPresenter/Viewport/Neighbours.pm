@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 package PPresenter::Viewport::Neighbours;
 
@@ -8,7 +8,7 @@ use Tk;
 sub new($$;)
 {   my ($class, $show, $viewport) = @_;
 
-    my $font       = $viewport->getFont('PROPORTIONAL', 'regular',
+    my $font       = $viewport->font('PROPORTIONAL', 'regular',
         'roman', $viewport->{-neighbourNameSize});
 
     my $fontheight = 10;
@@ -16,7 +16,7 @@ sub new($$;)
     my $background = $viewport->{-progressBackground};
     my $foreground = $viewport->{-neighbourNameColor};
 
-    my $display  = $viewport->getScreen->Canvas
+    my $display  = $viewport->screen->Canvas
         ( -background => $background
         , -height     => $fontheight +4
         );

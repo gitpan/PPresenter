@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 package PPresenter::Formatter;
 
@@ -6,7 +6,7 @@ use strict;
 use PPresenter::StyleElem;
 use base 'PPresenter::StyleElem';
 
-use constant defaults =>
+use constant ObjDefaults =>
 { type         => 'formatter'
 , -nestIndents => [ [ '+0', '10%'  ]
                   , [ '+0', '17%'  ]
@@ -32,26 +32,29 @@ sub strip($$$)
 }
 
 #
-# format
-#    Format a string into a PPresenter::Text-widget.
+# To be extended by all implementations.
 #
 
-sub format($)
-{   my ($former, $args) = @_;
-    print STDERR "WARNING: formatter does not implement format().\n";
+sub prepareSlide($$)
+{   my ($former, $slide, $view) = @_;
+    die "Formatter " .$former->{-name} . " must implement prepareSlide()\n";
+}
 
+sub createSlide($$$$)
+{   my ($former, $show, $slide, $view, $dx) = @_;
+    die "Formatter " .$former->{-name} . " must implement createSlide()\n";
 }
 
 #
 # Information about nesting of lists.
 #
 
-sub getNestInfo($$)
+sub nestInfo($$)
 {   my ($former, $view, $nest) = @_;
     my $nr_nests = @{$former->{-nestIndents}};
     my $takenest = $nest > $nr_nests ? $nr_nests : $nest;
 
-    (@{$former->{-nestIndents}[$takenest]}, $view->getNestImage($nest));
+    (@{$former->{-nestIndents}[$takenest]}, $view->nestImage($nest));
 }
 
 1;

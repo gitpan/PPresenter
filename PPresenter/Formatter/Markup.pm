@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 package PPresenter::Formatter::Markup;
 
@@ -15,7 +15,7 @@ use PPresenter::Formatter::Markup_placer;
 #use PPresenter::Formatter::Markup_html;
 
 
-use constant defaults =>
+use constant ObjDefaults =>
 { -name             => 'markup'
 , -aliases          => [ 'Markup', 'hypertext', 'html', 'default' ]
 
@@ -31,6 +31,7 @@ use constant defaults =>
   , SMALL      => 'TEXT SIZE=-1'
   , STRONG     => 'TEXT SIZE=+1 B'
   , TITLE      => 'CENTER SIZE=+1'
+  , FOOTER     => 'RIGHT I SIZE=-1'
   }
 , specials          =>
   { amp        => '&'
@@ -69,33 +70,24 @@ sub addSpecialCharacters($@)
 }
 sub addSpecialCharacter($@) {shift->addSpecialCharacters(@_)}
 
-#
-# Format
-#
-
-sub format($$)
-{   my ($former, $args, $contents) = @_;
-
-    my $parsed = $former->parse($contents);
-#print $former->parseTree($parsed), "\n" if defined $parsed;
-
-    $former->place($args, $parsed);
-    # returns a program.
-}
-
 sub titleFormat($$)
 {   my ($former, $view, $contents) = @_;
     return "<TITLE>$contents"
+}
+
+sub footerFormat($$)
+{   my ($former, $view, $contents) = @_;
+    return "<FOOTER>$contents"
 }
 
 #
 # Export
 #
 
-sub toHTML($$)
-{   my ($former, $args, $contents) = @_;
-    my $parsed = $former->parse($contents);
-    $former->html($args, $parsed);
+sub toHTML($$$)
+{   my ($former, $slide, $view, $contents) = @_;
+    my $parsed = $former->parse($slide, $view, $contents);
+    $former->html($parsed);
 }
 
 1;

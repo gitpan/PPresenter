@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 package PPresenter::Slide;
 
@@ -8,18 +8,21 @@ use base 'PPresenter::Object';
 
 use PPresenter::SlideView;
 
-use constant defaults =>
+use constant ObjDefaults =>
 { -name        => undef
 , -aliases     => undef
 , -title       => undef
 
-, -reqtime     => '1m'     # expected time to use this slide.
+, -reqtime     => '3m'     # expected time to use this slide.
 , -active      => 1        # by default selected to be shown.
 , -proceed     => 'STOP'   # STOP (for user), TIME (reqtime), NOW (go on)
 , -tag         => undef    # may be used with one tag only.
 , -tags        => undef    # after each slide initiation 'all' is added.
 , -nextSlide   => undef    # next slide.
 , -notes       => undef    # slide notes.
+
+, -callback    => undef    # [list of] dynamic-spec + subs to be called
+, -callbacks   => undef
 
 , show         => undef
 };
@@ -62,7 +65,7 @@ sub InitObject()
     my $show = $slide->{show};
     $slide->make_id($show);
 
-    print Presenter::TRACE "Slide $slide->{number}: \"$slide\".\n";
+    print PPresenter::TRACE "Slide $slide->{number}: \"$slide\".\n";
 
     $slide->SUPER::InitObject;
 
@@ -80,15 +83,34 @@ sub InitObject()
     $slide;
 }
 
+sub find($$)
+{   my ($slide, $what, $which) = @_;
+
+    return PPresenter::SlideView->fromList($slide->{views}, $which)
+        if $what eq 'view';
+
+    if($what eq 'view_of_viewport')
+    {   foreach (@{$slide->{views}})
+        {   return $_ if $_->viewport->toString eq "$which";
+        }
+        return undef;
+    }
+
+    die "Find $what in $slide not implemented.\n";
+}
+   
 sub make_id($)
 {   my ($slide,$show) = @_;
 
-    $slide->{number}   = $show->getNumberSlides;   # count from 0
+    $slide->{number}   = $show->numberSlides;   # count from 0
 
-    my $title = $slide->{-title}
-             || ($slide->{-title} = "Slide $slide->{number}");
+    local $_ = $slide->{-title}
+            || ($slide->{-title} = "Slide $slide->{number}");
 
-    ($slide->{-name} = $title) =~ s/\s+/ /gs;
+    s/\s+/ /gs;
+    s/<.*?>//g;
+
+    $slide->{-name} = $_;
     $slide;
 }
 
@@ -97,7 +119,7 @@ sub hasSlideNotes() {defined $_[0]->{-notes}}
 sub expand_views($$$)
 {   my ($slide, $show, $general, $nested_options) = @_;
 
-    my @viewports = $show->getViewports;
+    my @viewports = $show->viewports;
     my ($other, @used_vps, @vp_options);
    
     # Look for the specified viewports.
@@ -168,7 +190,7 @@ sub expand_views($$$)
         @tmp_options{keys %$general} = values %$general
             if $options != $general;  # include general in nested options.
 
-        my $style_flags = PPresenter::Style::getStyleFlags($options);
+        my $style_flags = PPresenter::Style::styleFlags($options);
         map {delete $options->{"-$_"}} keys %$style_flags;
         %tmp_options = ();
 
@@ -222,18 +244,61 @@ sub resolveViewportOptions($)
 
 sub prepare()
 {   my $slide = shift;
+
     map {$_->prepare($slide)} @{$slide->{views}};
+    return $slide unless $slide->{show}->enableCallbacks;
+
+    my $default_view = $slide->view('FIRST');
+
+    # Hooks for executing perl-code when a [phase of] a slide appears.
+    my $callbacks = $slide->{-callback}
+                 || $slide->{-callbacks}
+                 || return $slide;
+
+    if(ref $callbacks eq 'CODE')
+    {   $default_view->addProgram('',  Tk::Callback->new( [$callbacks] ) );
+    }
+    elsif(ref $callbacks ne 'ARRAY')
+    {   warn "WARNING $slide: Do not understand callback.\n";
+    }
+    elsif(ref $callbacks->[0] eq 'ARRAY')
+    {   foreach (@$callbacks)
+        {   local @_ = @$_;
+            $default_view->addProgram(shift, Tk::Callback->new([@_]) );
+        }
+    }
+    else
+    {   local @_ = @$callbacks;
+        $default_view->addProgram(shift, Tk::Callback->new([@_]) );
+    }
+
+    $slide;
 }
 
 sub show()
 {   my $slide = shift;
     map {$_->show($slide)} @{$slide->{views}};
+    $slide;
 }
 
 sub nextPhase()
 {   my $slide = shift;
     map {$_->nextPhase} @{$slide->{views}};
     $slide->{phase_delay} = 0;
+}
+
+sub gotoPhase($)
+{   my ($slide, $number) = @_;
+    map {$_->gotoPhase($number)} @{$slide->{views}};
+    $slide->{phase_delay} = 0;
+}
+
+sub inLastPhase()    {shift->{views}[0]->inLastPhase}
+sub phase()          {shift->{views}[0]->phase}
+
+sub exportedPhases()
+{   my $slide = shift;
+    $slide->{views}[0]->exportedPhases($slide);
 }
 
 sub startProgram($)
@@ -246,7 +311,7 @@ sub suspended($)
     $slide->{phase_delay} += $interval;
 }
 
-sub getPhaseDelay() {$_[0]->{phase_delay}}
+sub phaseDelay() {$_[0]->{phase_delay}}
 
 #
 # Tags
@@ -263,15 +328,15 @@ sub hasTag($)
     grep {$tag eq $_} @{$slide->{-tags}};
 }
 
-sub getTags()          {@{$_[0]->{-tags}}}
-sub getNumber()        {$_[0]->{number} }
-sub getTitle()         {$_[0]->{-title} }
-sub isActive()         {$_[0]->{-active}}
-sub getButton()        {$_[0]->{button} }
-sub getRequiredTime()  {$_[0]->{-reqtime}}
-sub getViews()         {@{$_[0]->{views}}}
+sub tags()         {@{$_[0]->{-tags}}}
+sub number()       {$_[0]->{number} }
+sub title()        {$_[0]->{-title} }
+sub isActive()     {$_[0]->{-active}}
+sub button()       {$_[0]->{button} }
+sub requiredTime() {$_[0]->{-reqtime}}
+sub views()        {@{$_[0]->{views}}}
 
-sub getView($)
+sub view($)
 {   my ($slide, $name) = @_;
     PPresenter::SlideView->fromList($_[0]->{views}, $name);
 }
@@ -311,7 +376,7 @@ sub statusButtons($$$$)
 
     my $time_spent = $parent->TimerLabel
         ( -value      => 0
-        , -maxValue   => $slide->getRequiredTime
+        , -maxValue   => $slide->requiredTime
         , -colorScale => $colorscale
         );
     $slide->{time_spent} = $time_spent;
@@ -345,26 +410,7 @@ sub wantNextSlide()
         if $proceed eq 'TIME';
 
     my $phase = $proceed =~ /PHASE\s*(\d+)/i;
-    return $slide->{program}->getPhase >= $phase;
-}
-
-#
-# Export
-#
-
-sub exportViews($$@)
-{
-   my ($slide, $show, $viewport, $borders, $function) = splice @_, 0, 5;
-
-    $show->showSlide($slide);
-    $show->flushPhases;
-
-    foreach (@{$slide->{views}})
-    {   next unless $_->showsOnViewport($viewport);
-        return $_->exportView($borders, $function, @_);
-    }
-
-    return undef;
+    return $slide->{program}->phase >= $phase;
 }
 
 #

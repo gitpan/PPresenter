@@ -1,4 +1,4 @@
-Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 - INSTALL
 
@@ -13,21 +13,20 @@ it might be that earlier versions work too.
 - Perl 5.005_02 or higher
   You can best use the latest stable version, which is located at
   http://www.CPAN.org/src/stable.tar.gz
-- Perl/Tk 800.015      (obligatory)
+- Perl/Tk 800.015 or higher  (obligatory)
   http://www.CPAN.org/modules/by-module/Tk/Tk800.015.tar.gz
-- X11::Protocol v0.04  (optional)
+  Versions 800.016-800.019 are less stable.
+- X11::Protocol v0.04        (optional)
   http://www.CPAN.org/modules/by-module/X11/X11-Protocol-0.04.tar.gz
 
 For ImageMagick:       (optional)
-from http://www.wizards.dupont.com/cristy/ImageMagick/
-- libjpeg.so.6      
-- ImageMagick v4.2.9
-- PerlMagick v4.29
-The website of ImageMagick will change to www.ImageMagick.org with
-the coming release of version 5.1.
+http://www.ImageMagick.org
+- ImageMagick v4.2.9 and PerlMagick v4.29   Other version will work
+  too, as long as the ImageMagick and PerlMagick versions match!
 
-You can really better install all these packages straight from
-source, because in my experience, the rpms do not go nice together.
+You can best compile Perl and Perl/Tk yourself (best chance that it will
+work together).  For ImageMagick, the binary distribution is linked to
+most image libraries: that's quite a lot of work to collect yourself.
 
 ** Installing this package.
 

@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 # Simple formatter is a simplification of the markup formatter: you
 # specify nesting with dashes, that's all.
@@ -11,7 +11,7 @@ use base 'PPresenter::Formatter::Markup';
 
 use Tk;
 
-use constant defaults =>
+use constant ObjDefaults =>
 { -name    => 'simple'
 , -aliases => undef
 };
@@ -23,11 +23,11 @@ sub strip($$$;)
 }
 
 #
-# Format
+# Parse
 #
 
-sub format($$)
-{   my ($self, $args, $contents) = @_;
+sub parse($$$)
+{   my ($self, $slide, $view, $contents) = @_;
 
     my @indents    = (0);
     my $indent     = 0;
@@ -52,7 +52,7 @@ sub format($$)
             while($#indents)
             {   if($indents[-1] < $prefix_length)
                 {   warn
-  "Do not understand indentation on slide $args->{slide}, line\n  $line";
+  "Do not understand indentation on slide $slide, line\n  $line";
                     last;
                 }
                 last if $prefix_length == $indents[-1];
@@ -64,12 +64,17 @@ sub format($$)
         $markup .= (defined $dash ? '<LI>' : '') . $text . "<BR>\n";
     }
 
-    $self->SUPER::format($args, $markup);
+    $self->SUPER::parse($slide, $view, $markup);
 }
 
 sub titleFormat($$)
 {   my ($self, $slide, $title) = @_;
     "<TITLE>$title";
+}
+
+sub footerFormat($$)
+{   my ($self, $slide, $footer) = @_;
+    "<FOOTER>$footer";
 }
 
 1;

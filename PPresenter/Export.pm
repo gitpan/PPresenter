@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 package PPresenter::Export;
 
@@ -6,17 +6,20 @@ use strict;
 use PPresenter::Object;
 use base 'PPresenter::Object';
 
+use Tk qw(DONT_WAIT ALL_EVENTS DoOneEvent);
+
 use vars qw(@EXPORT @papersizes);
 @EXPORT = qw/@papersizes/;
 
-use constant defaults =>
+use constant ObjDefaults =>
 { -viewports      => 'ALL'      # NOTES, SLIDES, ALL or name or [ names ]
 , -exportSlide    => 'ACTIVE'   # ACTIVE, CURRENT, or ALL
 , -includeBorders => 0
 
 , -imageFormat    => 'gif'
-, -imageWidth     => undef
+, -imageWidth     => 500
 , -imageQuality   => 80
+, -paperSize      => 'A4'
 };
 
 # sizes at 72dpi.
@@ -28,51 +31,82 @@ use constant defaults =>
 , [ B4 => 709,1002 ], [ B5 => 501,709 ]
 );
 
-sub getPaperSize($)
-{   my ($export, $name) = @_;
+sub paperSize(;$)
+{   my $export = shift;
+    my $name   = shift || $export->{-paperSize};
     foreach (@papersizes)
     {   return @$_[1,2] if $_->[0] eq $name;
     }
     die "Unknown paper size $name.\n";
 }
 
-sub makeSlideExports($$$$@)
-{   my ($export, $show, $slide, $viewports, $function) = splice @_, 0, 5;
+sub mapExportedPhases($$)
+{   my ($export, $show, $function) = @_;
 
-    # viewports are entered in has-order, but shall be produced in
-    # the order of creation.  Limited number of viewports, so don't
-    # bother about complexity.
+    my @viewports = $export->selectedViewports;
+    my @ret;
 
-    my @viewports;
-    foreach ($show->getViewports)
-    {   my $name = "$_";
-        push @viewports, $_
-            if grep {$name eq $_} @$viewports;
+    foreach my $slide ($export->selectedSlides($show))
+    {   $slide->prepare->show;          # slide must be shown first, otherwise
+        $slide->startProgram($show);    # the program-info from callbacks and
+                                        # content is not known.
+        foreach ($slide->exportedPhases)
+        {   $slide->gotoPhase($_);
+            push @ret, $function->($export, $show, $slide, \@viewports)
+        }
     }
 
-    return map {$slide->exportViews($show, $_,
-        $export->{-includeBorders}, $function, export => $export, @_)}
-            @viewports;
+    @ret;
+}
+
+sub mapSlideViewports
+{   my ($export, $show, $slide, $viewports, $function) = @_;
+    my @viewport_order = $show->viewports;
+    my @ret;
+
+    # Viewport-map is made in order of definition in show.
+    foreach my $vp (@viewport_order)
+    {   next unless grep {"$vp" eq $_} @$viewports;
+        push @ret, $function->( $export, $show, $slide
+                              , $slide->find(view_of_viewport => $vp));
+    }
+
+    @ret;
 }
 
 my $imgs_read = 0;
+my $picture_taken;
 
-sub getWindowImage($$$)
-{   my ($export, $show, $opts) = @_;
-    my ($display, $window, $borders)
-        = @$opts{ qw/display window_id borders/ };
+sub windowImage($$$$)
+{   my ($export, $show, $slide, $view) = @_;
+    my $mainwindow = $view->viewport->screen;
+    $mainwindow->raise;
+    $mainwindow->update;
 
-    my $img = $show->runsOnX
-            ? $export->get_x11_image($display, $window, $borders)
-            : $export->get_windows_image($display, $window, $borders);
+    if($show->runsOnX)
+    {   # Problem: X11 has a-sync screen-updates, so we must give the
+        # server some time to update the screen, before taking pictures.
+        undef $picture_taken;
+        $mainwindow->idletasks;
 
-    $imgs_read++;
-    $img;
+        $mainwindow->after(1000
+        , [ sub {$export->get_x11_image(@_)}, $show, $slide, $view ]
+        );
+        $mainwindow->waitVariable(\$picture_taken);
+        return $picture_taken;
+    }
+
+    die "Taking images only supported for X11.\n";
 }
 
 sub get_x11_image($$$)
-{   my ($export, $display, $window, $borders) = @_;
-    my $tmp   = "/tmp/gpp$$-$imgs_read.xwd";
+{   my ($export, $show, $slide, $view) = @_;
+    my $tmp      = ($ENV{'TMPDIR'} || '/tmp')."/gpp$$-$imgs_read.xwd";
+
+    my $borders  = $export->{-includeBorders};
+    my $viewport = $view->viewport;
+    my $display  = $viewport->display;
+    my $window   = $borders ? $viewport->screenId : $viewport->canvasId;
 
     my $cmd   = "xwd >$tmp -display $display -id $window -silent";
     $cmd     .= " -nobdrs" unless $borders;
@@ -81,13 +115,8 @@ sub get_x11_image($$$)
 
     my $image = $export->readImage($tmp);
     unlink $tmp;
-
-    $image;
-}
-
-sub get_windows_image($$$)
-{   my ($export, $display, $window, $borders) = @_;
-    die "Can't get dumps of window screens yet.";
+    $imgs_read++;
+    $picture_taken = $image;
 }
 
 sub readImage($)             # You shall override this.
@@ -138,7 +167,7 @@ sub tkImageSettings($$)
 
 sub tkViewportSettings($$)
 {   my ($export, $show, $parent) = @_;
-    my @viewports = $show->getViewports;
+    my @viewports = $show->viewports;
 
     if(@viewports==1)
     {   $export->{vp}{"$viewports[0]"} = 1;
@@ -198,9 +227,9 @@ sub selectedSlides($)
 {   my ($export, $show) = @_;
 
     my $slides = $export->{-exportSlide};
-    return $show->{current_slide}               if $slides eq 'CURRENT';
-    return grep {$_->isActive} $show->getSlides if $slides eq 'ACTIVE';
-    return $show->getSlides                     if $slides eq 'ALL';
+    return $show->current      if $slides eq 'CURRENT';
+    return $show->activeSlides if $slides eq 'ACTIVE';
+    return $show->slides       if $slides eq 'ALL';
 
     die "-exportSlide shall contain CURRENT, ACTIVE, or ALL, not $slides.\n";
 }
@@ -235,8 +264,8 @@ sub optionlist($$@)
 
 sub popup($$)
 {   my ($export, $show, $screen) = @_;
-    my $popup = $export->getPopup($show, $screen)
-                       ->Popup(-popover => 'cursor');
+    $export->popup($show, $screen)
+           ->Popup(-popover => 'cursor');
 }
 
 1;

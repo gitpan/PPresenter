@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 package PPresenter::Style::SlideNotes;
 
@@ -6,7 +6,7 @@ use strict;
 use PPresenter::Style;
 use base 'PPresenter::Style';
 
-use constant defaults =>
+use constant ObjDefaults =>
 { -name       => 'SlideNotes'
 , -aliases    => [ 'slidenotes', 'slide notes', 'Slide Notes', 'slideNotes' ]
 };

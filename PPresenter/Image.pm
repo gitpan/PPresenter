@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 package PPresenter::Image;
 
@@ -7,7 +7,7 @@ use PPresenter::Object;
 use base 'PPresenter::Object';
 use File::Basename;
 
-use constant defaults =>
+use constant ObjDefaults =>
 { -name        => ''    # defaults to filename later
 , -aliases     => undef
 , -file        => undef
@@ -38,7 +38,7 @@ sub InitObject()
     # Find-out for which screen-size this image was created.
 
     my $show = $img->{show};
-    $img->{-sizeBase} = $show->getImageSizeBase
+    $img->{-sizeBase} = $show->imageSizeBase
         unless defined $img->{-sizeBase};
 
     $img->{-resize} = ($show->resizeImages && defined $img->{-sizeBase})
@@ -65,11 +65,11 @@ sub sameSource($)
     }
 }
 
-sub getScaling($)
+sub scaling($)
 {   my ($img,$viewport) = @_;
 
     return 1.0 unless $img->{-resize};
-    my $scaling = $viewport->getGeometryScaling($img->{-sizeBase});
+    my $scaling = $viewport->geometryScaling($img->{-sizeBase});
     ($scaling < 1.0 || $img->{-enlarge}) ? $scaling : 1.0;
 }
 

@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 package PPresenter::Formatter::Markup_html;
 
@@ -36,8 +36,8 @@ my %trans =
 , UL   => [ 1, ]
 );
 
-sub html($$$)
-{   my ($self, $args, $parsed) = @_;
+sub html($)
+{   my ($self, $parsed) = @_;
 
     my %b =
     ( fontsize => 3

@@ -1,11 +1,11 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 package PPresenter;
 
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.00';
+$VERSION = 'v1.10';
 
 # This package works like an interface description to the Show.pm
 # package, which runs the show.  The interface is defined to restrict
@@ -17,8 +17,8 @@ use PPresenter::Show;
 
 sub copyright()
 {   <<COPYLEFT
-Portable Presenter v$VERSION (2000/01/10), Mark Overmeer.
-Copyright (C) 1999, Free Software Foundation Inc.
+Portable Presenter v$VERSION (2000/06/05), Mark Overmeer.
+Copyright (C) 2000, Free Software Foundation FSF.
 PPresenter is available under GPL, and comes with absolutely NO WARRANTY.  
 Please read the copyright message.
 

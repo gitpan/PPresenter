@@ -1,12 +1,7 @@
 
 Some wishes:
 
-- Speed improvement.  Scalable fonts for large characters are really
-  slow under X11.  This should be solved.
-
 - Adding TrueType-fonts.  They should be faster than scaling fonts.
-
-- Port and then test Win32 Perl... had no chance to test that...
 
 - Full tutoral on the Markup formatter.  A short version is available.
 
@@ -22,5 +17,4 @@ Some wishes:
   slide-phases too.
 
 - Slides can only be exported as images.  need to create a covertion from
-
   Markup into real HTML to facilitate other exports.

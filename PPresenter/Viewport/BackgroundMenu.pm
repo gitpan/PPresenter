@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 # Viewport::BackgroundMenu
 #
@@ -35,6 +35,11 @@ sub new($$$;)
     $phases->checkbutton
     ( -label   => 'Only finals'
     , -variable=> \$show->{-flushPhases}
+    );
+
+    $phases->checkbutton
+    ( -label   => 'Start callbacks'
+    , -variable=> \$show->{-enableCallbacks}
     );
 
     $menu->add
@@ -115,7 +120,7 @@ sub new($$$;)
 
     # Exporters
 
-    my @exporters = $show->getExporters;
+    my @exporters = $show->exporters;
     if(@exporters)
     {   my $export = $menu->Menu
         ( -tearoff     => 0
@@ -137,9 +142,9 @@ sub new($$$;)
     $menu->command
     ( -label       => 'Iconify'
     , -accelerator => 'I'
-    , -command     => sub {$show->IconifyControl}
+    , -command     => sub {$show->iconifyControl}
     );
-    $screen->bind("<Key-I>", sub {$show->IconifyControl} );
+    $screen->bind("<Key-I>", sub {$show->iconifyControl} );
 
     # Control controls on control viewport ;)
 

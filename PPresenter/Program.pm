@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 # Program
 #
@@ -33,11 +33,15 @@ sub start($)
            || $show->mustFlushPhases;
 
     $program->{phase} = -1;
-    $program->nextPhase while $program->{phase} < $program->{startPhase};
+
+    $program->nextPhase
+        while $program->{phase} < $program->{startPhase};
 }
 
-sub getNumberPhases() {$_[0]->{last_phase}+1}
-sub getPhase()        {$_[0]->{phase}}
+sub numberPhases() {shift->{last_phase}+1}
+sub lastPhase()    {shift->{last_phase}}
+sub phase()        {shift->{phase}}
+sub inLastPhase()  {$_[0]->{phase} == $_[0]->{last_phase}}
 
 sub nextPhase()
 {   my $program = shift;
@@ -55,6 +59,14 @@ sub nextPhase()
 
     $program->flush_phase if $program->{show}->mustFlushPhases;
     $program;
+}
+
+sub gotoPhase($)
+{   my ($program, $phase) = @_;
+
+    $program->nextPhase
+       while $program->{phase} < $phase
+          && $program->{phase} < $program->{last_phase};
 }
 
 sub flush_phase()

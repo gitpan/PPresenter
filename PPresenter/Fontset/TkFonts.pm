@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 package PPresenter::Fontset::TkFonts;
 
@@ -6,14 +6,14 @@ use strict;
 use PPresenter::Fontset;
 use base 'PPresenter::Fontset';
 
-use constant defaults =>
+use constant ObjDefaults =>
 { -name             => 'tkfonts'
 , -aliases          => [ 'default', 'TkFonts', 'tkfont' ]
 , -fixedFont        => 'Courier'
 , -proportionalFont => 'Helvetica'
 };
 
-sub getFont($$$$)
+sub font($$$$)
 {   my ($fontset, $viewport, $type, $weight, $slant, $size) = @_;
     #  type     : PROPORTIONAL, FIXED, or Tk-like
     #  weight   : bold, normal
@@ -29,7 +29,7 @@ sub getFont($$$$)
     # Create the font if it does not exist yet.
 
     my $fontname = "-$fam-$weight-$slant-$real_size-";
-    $fontset->{$fontname} = $viewport->getScreen->fontCreate
+    $fontset->{$fontname} = $viewport->screen->fontCreate
     ( -family     => $fam,
       -slant      => $slant,
       -size       => $real_size

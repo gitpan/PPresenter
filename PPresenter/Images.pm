@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 package PPresenter::Images;
 
@@ -8,7 +8,7 @@ use PPresenter::Image;
 
 use base 'PPresenter::Object';
 
-use constant defaults =>
+use constant ObjDefaults =>
 { -name      => 'image registry'
 , -imageDirs => undef
 , show       => undef
@@ -42,7 +42,7 @@ sub InitObject()
 sub cleanup_imagedir($)
 {   my ($self, $dir) = @_;
 
-    print Presenter::TRACE "Removing scaled images in $dir.\n";
+    print PPresenter::TRACE "Removing scaled images in $dir.\n";
 
     $self->{show}->remove_dir($dir);
 }
@@ -148,7 +148,7 @@ sub createImage(@)
     {   return $_ if $_->sameSource(\%options);
     }
 
-    print Presenter::TRACE "Defining new image $source.\n";
+    print PPresenter::TRACE "Defining new image $source.\n";
 
     if($show->hasImageMagick)
     {   require PPresenter::Image::Magick;

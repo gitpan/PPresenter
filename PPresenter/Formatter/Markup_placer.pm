@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 package PPresenter::Formatter::Markup_placer;
 
@@ -9,6 +9,7 @@ use Exporter;
 use base 'Exporter';
 
 sub flush_line();
+sub process_list($;);
 
 my $tagnr = 0;
 sub new_tag() { "t".$tagnr++; }
@@ -23,16 +24,12 @@ my (%b, %g);
 my ($self, $viewport);
 
 sub place($$$)
-{   my ($my_self, $args, $parsed) = @_;
+{   my ($my_self, $show, $slide, $view, $part, $dx, $parsed) = @_;
 
     $self      = $my_self;
-    my ($x, $y, $w, $h, $tag) = @$args{qw/x y w h id/};
-
-    my $view   = $args->{view};
-    my $canvas = $args->{viewport}->getCanvas;
-
+    my $canvas = $view->canvas;
     my $now    = new_tag;
-    $view->addProgram($now, '');
+    $view->addProgram('', $now);
 
     %b = # Variables which change in blocks.
     ( fonttype   => 'PROPORTIONAL'
@@ -42,7 +39,7 @@ sub place($$$)
     , underline  => 0
     , overstrike => 0
     , backdrop   => $view->hasBackdrop
-    , color      => $view->getColor('FGCOLOR')
+    , color      => $view->color('FGCOLOR')
 
     , indent     => 0
     , rindent    => 0  # right-side indentation.
@@ -56,23 +53,18 @@ sub place($$$)
     );
 
     %g = # Variables which are not block related.
-    ( canvas     => $canvas
-    , slide      => $args->{slide}
-    , view       => $args->{view}
-    , viewport   => $args->{viewport}
-    , tag        => $tag
+    ( canvas     => $view->canvas
+    , slide      => $slide
+    , view       => $view
+    , viewport   => $view->viewport
     , formatter  => $self
-
-      # Outline
-    , 'x' => $x, 'y' => $y
-    ,  w  => $w,  h  => $h
 
       # current line
     , lineascent => 0
     , linedescent=> 0
     , needs_space=> 0
     , accumx     => 0
-    , accumy     => $y
+    , accumy     => $part->{y}
     , makeLI     => undef
 
     , left_image_end  => 0
@@ -80,6 +72,9 @@ sub place($$$)
     , image_indent    => 0
     , image_rindent   => 0
     );
+
+    map {$g{$_} = $part->{$_}} qw/x y w h slidetag parttag/;
+    $g{x} += $dx;
 
     no_marks();
     process_list($parsed);
@@ -106,12 +101,15 @@ my %command_action;
 , LI   => sub { start_paragraph(@_); change_font(@_);
                   $g{makeLI} = $b{dynamictag} }
 , MARK => \&set_mark
+, N    => sub { $b{fontweight} = 'normal' }
 , O    => sub { $b{overstrike} = 1 }
 , OL   => \&ordered_list
 , P    => sub { flush_line; skip_line(@_); start_paragraph(@_) }
 , PRE  => sub { $b{fonttype} = 'FIXED'; $b{reformatText} = 0;
                   start_paragraph(@_) }
+, PROP => sub { $b{fonttype} = 'PROPORTIONAL' }
 , REDO => \&restore_mark
+, RIGHT => sub { start_paragraph(@_); $b{align} = 'right' }
 , SUB  => undef
 , SUP  => undef
 , TEXT => sub {}
@@ -123,7 +121,7 @@ my %command_action;
 sub ordered_list
 {   my $params = shift;
     start_paragraph(@_);
-    my ($size, $perc, $src) = $self->getNestInfo($g{view}, $b{nesting}++);
+    my ($size, $perc, $src) = $self->nestInfo($g{view}, $b{nesting}++);
 
     $b{indent} = $self->takePercentage($perc,$g{w});
     $params->{SIZE} = $size unless exists $params->{SIZE};
@@ -136,7 +134,7 @@ sub unordered_list
     start_paragraph(@_);
 
     (my $size, my $perc, $b{listitem})
-         = $self->getNestInfo($g{view}, $b{nesting}++);
+         = $self->nestInfo($g{view}, $b{nesting}++);
 
     $b{indent} = $self->takePercentage($perc,$g{w});
     $params->{SIZE} = $size unless exists $params->{SIZE};
@@ -162,8 +160,8 @@ sub include_image($)
 
     return unless defined $img;
 
-    my ($width, $height) = $img->prepare(@g{ qw/viewport canvas/ })
-                               ->getDimensions($g{viewport});
+    $img->prepare(@g{ qw/viewport canvas/ });
+    my ($width, $height) = $img->dimensions($g{viewport});
 
     my $hspace = $self->takePercentage(
         (exists $params->{HSPACE} ? delete $params->{HSPACE}
@@ -202,7 +200,7 @@ sub include_image($)
 
     $img->show(@g{ qw/viewport canvas/ },
         , $g{'x'} + $imgx, $imgy
-        , -tags   => [ $g{tag}, $b{dynamictag} ]
+        , -tags   => [ $g{slidetag}, $g{parttag}, $b{dynamictag} ]
         , -anchor => 'nw'
         );
 }
@@ -225,17 +223,19 @@ sub change_font($)
 
     $b{fonttype} = delete $params->{FACE} if exists $params->{FACE};
     if(exists $params->{TT}){$b{fonttype}='FIXED'; delete $params->{TT}}
+    if(exists $params->{PROP}){$b{fonttype}='PROPORTIONAL'; delete $params->{PROP}}
     if(exists $params->{B}) {$b{fontweight}='bold'; delete $params->{B}}
     if(exists $params->{I}) {$b{fontweight}='italic'; delete $params->{I}}
+    if(exists $params->{N}) {$b{fontweight}='normal'; delete $params->{N}}
     if(exists $params->{BD}){$b{backdrop}=delete $params->{BD} }
-    $b{color} = $g{view}->getColor(delete $params->{COLOR})
+    $b{color} = $g{view}->color(delete $params->{COLOR})
         if exists $params->{COLOR};
 
     if(exists $params->{SHOW})
     {   $b{dynamictag} = new_tag;
         my $when = delete $params->{SHOW};
         $when =~ s/"//g;
-        $g{view}->addProgram($b{dynamictag},$when);
+        $g{view}->addProgram($when, $b{dynamictag});
     }
 }
 
@@ -318,7 +318,7 @@ sub restore_mark($;)
 #
 
 sub create_font()
-{    $g{viewport}->getFont(@b{qw/fonttype fontweight fontslant fontsize/} );
+{    $g{viewport}->font(@b{qw/fonttype fontweight fontslant fontsize/} );
 }
 
 sub current_bounds()
@@ -433,7 +433,7 @@ sub flush_line()
             shift @linewords;
         }
 
-        my @tags = ( $g{tag} );
+        my @tags = @g{ 'slidetag', 'parttag' };
         push @tags, $dynamictag if defined $dynamictag;
 
         if($backdrop)
@@ -443,7 +443,7 @@ sub flush_line()
             , $baseline-$ascent+$backdrop
             , -text   => $text
             , -anchor => 'nw'
-            , -fill   => $g{view}->getColor('BDCOLOR')
+            , -fill   => $g{view}->color('BDCOLOR')
             , -font   => $font
             , -tags   => \@tags
             , -width  => 0
@@ -470,7 +470,7 @@ sub flush_line()
         {   # LI as part of UL
             $b{listitem}->show( @g{ qw/viewport canvas/ }
             , $xcorrect-10, int ($baseline - $g{lineascent}/3)
-            , -tags     => [ $g{tag}, $g{makeLI} ]
+            , -tags     => [ @g{ qw/slidetag parttag makeLI/ } ]
             , -anchor   => 'e'
             );
         }
@@ -484,7 +484,7 @@ sub flush_line()
             , -anchor => 'se'
             , -fill   => $g{linewords}[0][4]  # forms to font and color
             , -font   => $g{linewords}[0][3]  #   of first word in line.
-            , -tags   => [ $g{tag}, $g{makeLI} ]
+            , -tags   => [ @g{ qw/slidetag parttag makeLI/ } ]
             , -width  => 0
             );
         }

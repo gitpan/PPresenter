@@ -1,10 +1,13 @@
 #!/usr/local/bin/perl -w
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 use ExtUtils::MakeMaker;
 
-WriteMakefile( 'PREREQ_PM'    => { "Tk"               => "800.012" }
-             , 'NAME'         => 'PPresenter'
-             , 'VERSION_FROM' => 'PPresenter.pm'
-             );
+WriteMakefile
+( NAME      => 'PPresenter'
+, VERSION   => 'v1.10'
+, AUTHOR    => 'Mark Overmeer'
+, ABSTRACT  => 'Create presentations with Perl and Tk'
+, PREREQ_PM => { "Tk"               => "800.012" }
+);
 

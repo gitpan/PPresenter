@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 # The plain format is only a far-going simplification on the
 # markup formatter.  The whole text is put in <PRE>
@@ -11,7 +11,7 @@ use base 'PPresenter::Formatter::Markup';
 
 use Tk;
 
-use constant defaults =>
+use constant ObjDefaults =>
 { -name    => 'plain'
 , -aliases => undef
 };
@@ -22,19 +22,24 @@ sub strip($$$)
     return $string ;
 }
 
-sub format($$)
-{   my ($self, $args, $contents) = @_;
+sub parse($$$)
+{   my ($self, $slide, $view, $text) = @_;
 
-    $self->SUPER::format($args, <<PREFORMAT);
+    $self->SUPER::parse($slide, $view, <<PREFORMAT);
 <PRE>
-$contents
+$text
 <PRE>
 PREFORMAT
 }
 
 sub titleFormat($$)
 {   my ($self, $slide, $title) = @_;
-    "<TITLE><TT>$title</TT>";
+    "<TITLE>$title</TITLE>";
+}
+
+sub footerFormat($$)
+{   my ($self, $slide, $footer) = @_;
+    "<FOOTER>$footer</FOOTER>";
 }
 
 1;

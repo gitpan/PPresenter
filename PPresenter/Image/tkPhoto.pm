@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 package PPresenter::Image::tkPhoto;
 
@@ -6,7 +6,7 @@ use strict;
 use Tk::Photo;
 use Tk::Derived;
 use PPresenter::Image;
-use base qw(PPresenter::Image Tk::Photo Tk::Derived);
+use base qw(Tk::Derived PPresenter::Image Tk::Photo);
 
 my $unique;
 
@@ -27,7 +27,7 @@ sub convert($@)
         $img->{source} = $_;
 
         push @images, $img;
-        print Presenter::TRACE "Added image $img.\n";
+        print PPresenter::TRACE "Added image $img.\n";
     }
 
     @images;
@@ -55,11 +55,11 @@ sub prepare($$)
 sub scale_photo($$$)
 {   my ($img, $photo, $viewport, $canvas) = @_;
 
-    my $scaling = $img->getScaling($viewport);
+    my $scaling = $img->scaling($viewport);
 
     if($scaling<0.67)
     {   $scaling = int(1/$scaling +0.5);
-        print Presenter::TRACE
+        print PPresenter::TRACE
            "Subsampling Tk::Photo $img with $scaling for viewport $viewport.\n";
 
         my $shrunk = $canvas->Photo( -width  => int($photo->width/$scaling)
@@ -72,7 +72,7 @@ sub scale_photo($$$)
     {   $scaling = int($scaling+0.5);
         warn "Poor image quality because $img is enlarged by factor $scaling.\n" if $^W;
 
-        print Presenter::TRACE
+        print PPresenter::TRACE
              "Zoom Tk::Photo $img $scaling times for viewport $viewport.\n";
 
         my $zoomed = $canvas->Photo( -width  => int($photo->width*$scaling)
@@ -100,7 +100,7 @@ sub show($$$)
     $img;
 }
 
-sub getDimensions($)
+sub dimensions($)
 {   my ($img, $viewport) = @_;
     my $photo = $img->{"photo_$viewport"};
     ($photo->width, $photo->height);

@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 package PPresenter::Viewport::SlideButtonBar;
 
@@ -11,7 +11,7 @@ sub getBar() { $_[0]->{control} }
 sub new($$$)
 {   my ($class, $show, $viewport) = @_;
 
-    my $control = $viewport->getScreen->Frame
+    my $control = $viewport->screen->Frame
         ( -height     => 12
         , -background => 'black'
         , -foreground => 'yellow'
@@ -30,7 +30,7 @@ sub new($$$)
     my $when  = 0;
     my $count = 0;
 
-    foreach my $slide ($show->getSlides)
+    foreach my $slide ($show->slides)
     {   my $info   = "Undefined";
         my $button = $self->make_button($control
             , [ \&select_slide, $self, $count++ ]
@@ -49,7 +49,7 @@ sub reconstruct()
 
     # Remove all buttons, displayed so far.
     my @buttons = $control->placeSlaves();
-    defined @buttons && map {$_->placeForget()} @buttons;
+    @buttons && map {$_->placeForget()} @buttons;
 
     my $when            = 0;
     my $buttonheight    = $control->cget(-height)-4;
@@ -57,13 +57,13 @@ sub reconstruct()
     my $sumtime = 0;
     foreach (@{$self->{buttons}})
     {   my $slide = $_->[0];
-        $sumtime += $slide->getRequiredTime if $slide->isActive;
+        $sumtime += $slide->requiredTime if $slide->isActive;
     }
 
     foreach (@{$self->{buttons}})
     {   my ($slide, $button, $info, $old_when) = @$_;
 
-        my $reqtime = $slide->getRequiredTime;
+        my $reqtime = $slide->requiredTime;
         $_->[3] = ($when+$reqtime)/$sumtime;
         next unless $slide->isActive;
 
@@ -133,7 +133,7 @@ sub make_button($$$;)
 sub make_info($;)
 {   my ($self, $slide, $when) = @_;
 
-    my ($title, $time) = ($slide->getTitle, $slide->getRequiredTime);
+    my ($title, $time) = ($slide->title, $slide->requiredTime);
     return <<INFO;
 slide\t$title ($slide->{number})
 time\t$time

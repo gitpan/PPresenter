@@ -1,4 +1,4 @@
-# Copyright (C) 1999, Free Software Foundation Inc.
+# Copyright (C) 2000, Free Software Foundation FSF.
 
 package PPresenter::Fontset;
 
@@ -6,7 +6,7 @@ use strict;
 use PPresenter::StyleElem;
 use base 'PPresenter::StyleElem';
 
-use constant defaults =>
+use constant ObjDefaults =>
 { type          => 'fontset'
 , -fontLabels   => [ qw/pico  micro tiny small   normal
                       large big   huge massive giant/]
@@ -33,7 +33,7 @@ sub InitObject()
     $fontset;
 }
 
-sub getFontSizes($$)
+sub fontSizes($$)
 {   my ($fontset, $viewport) = @_;
     return $fontset->{-fontSizes} if defined $fontset->{-fontSizes};
 
@@ -50,14 +50,14 @@ sub getFontSizes($$)
 sub sizeToPixels($$)
 {   my ($fontset, $viewport, $size) = @_;
     return $1 if $size =~ /^\s*(\d+)p$/;
-    $fontset->getFontSizes($viewport)->[$size];
+    $fontset->fontSizes($viewport)->[$size];
 }
 
 # A fontset will overrule this when there are only specific values allowed.
 sub calcRealFontSizes($$$)
 {   my ($fontset, $viewport, $raw) = @_;
     @_ = @$raw;
-    my $scaling = $viewport->getGeometryScaling(shift);
+    my $scaling = $viewport->geometryScaling(shift);
     map {int($_*$scaling)} @_;
 }
 
@@ -92,7 +92,7 @@ sub findFontSize($$$)
     return $relative_size;
 }
 
-sub getFontHeight($)
+sub fontHeight($)
 {   my ($fontset, $font) = @_;
     return $font->fontMetrics('-ascent')
            + $font->fontMetrics('-descent');

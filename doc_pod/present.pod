@@ -1,0 +1,36 @@
+
+=head1 NAME
+
+present - Start a Portable Presenter presentation.
+
+=head1 SYNOPSIS
+
+B<present> [ B<-nowarn> ]
+           [ [ B<-ppr> ] [ I<file>[B<.ppr>] ]
+           | [ B<-xml> ] [ I<file>B<.xml>   ]
+           ]
+
+=head1 DESCRIPTION
+
+Portable Presenter (PPresenter) is a package designed to give presentations.
+It is written in Perl/Tk only, which is available for UNIX and for Windows.
+
+The key features of PPresenter are: projection on multiple screens at
+the same time; scales with the size of the display; fully object-oriented,
+which means flexible and extensible.  You can write your slides in a
+perl-program (for maximum flexability), or supply the data in xml.
+
+Run C<present> with a filename with extentions B<.ppr> (a perl-program
+which is run with warnings on, unless the depricated option B<-nowarn>
+is supplied), or with a file with extention B<.xml> (a PPresenter file
+in XML format).  When no filename is supplied, then the standard-input is
+read.  B<-ppr> and B<-xml> overrule the filename extentions.
+
+
+=head1 SEE ALSO
+
+A full documentation in html is included in the package, and available
+on the website: C<www.dhp.nl/~ppresenter/>.
+
+=cut
+
