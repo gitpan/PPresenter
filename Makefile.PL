@@ -8,7 +8,7 @@ use English;
 
 WriteMakefile
 ( NAME      => 'PPresenter'
-, VERSION   => 'v1.14'
+, VERSION   => 'v1.15'
 , AUTHOR    => 'Mark Overmeer'
 , ABSTRACT  => 'Create presentations with Perl and Tk'
 , PREREQ_PM => { "Tk"    => "800.012" }

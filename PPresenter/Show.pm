@@ -71,11 +71,11 @@ sub InitObject(@)
     $show->add(style => $show->{-style})
         if defined $show->{-style};
 
-    $show->add('style', @{$show->{-styles}})
+    $show->add(style => @{$show->{-styles}})
         if defined $show->{-styles};
 
     $show->{selected_style} = $show->find_style('default')
-                             || $show->find_style('FIRST');
+                            || $show->find_style('FIRST');
 
     $show->{-totaltime} = $show->time2secs($show->{-totaltime})
          if defined $show->{-totaltime};

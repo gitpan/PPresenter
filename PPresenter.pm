@@ -5,7 +5,7 @@ package PPresenter;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = 'v1.14';
+$VERSION = 'v1.15';
 
 # This package works like an interface description to the Show.pm
 # package, which runs the show.  The interface is defined to restrict
@@ -17,7 +17,7 @@ use PPresenter::Show;
 
 sub copyright()
 {   <<COPYLEFT
-Portable Presenter v$VERSION (2000/10/24), Mark Overmeer.
+Portable Presenter v$VERSION (2001/02/17), Mark Overmeer.
 Copyright (C) 2000, Free Software Foundation FSF.
 PPresenter is available under GPL, and comes with absolutely NO WARRANTY.  
 Please read the copyright message.
@@ -54,24 +54,24 @@ sub addViewports(@) {shift->addViewport(@_)}
 sub addScreen(@)    {shift->addViewport(@_)}
 sub addScreens(@)   {shift->addViewport(@_)}
 
-#: my  $style = $show->addStyle(style-object-name)
+#: my $style  = $show->addStyle(style-object-name)
 #: my @styles = $show->addStyle(style-object-names);
 #: my @styles = $show->addStyle([style-object-names]);
 
 sub addStyle(@)  {${(shift)}->add('style', @_) }
 
-#: my  $slide = $show->addSlide(slide-data);
-#: my  $slide = $show->addSlide(slide);
+#: my $slide  = $show->addSlide(slide-data);
+#: my $slide  = $show->addSlide(slide);
 #: my @slides = $show->addSlides(slide,slide,...);
 
 sub addSlide(@)  {${(shift)}->add('slide', @_) }
 sub addSlides(@) {shift->addSlide(@_)}
 
-#: my  $elem = $show->find(elem-type, name);
+#: my $elem   = $show->find(elem-type, name);
 #:   name may be 'SELECTED' (the one selected, default),
 #:               'FIRST', 'LAST', number (sequence number),
 #:               or from -name/-aliases
-#: my @elems = $show->find(elem-type, 'ALL');
+#: my @elems  = $show->find(elem-type, 'ALL');
 #: There is also a $viewport->find and a $style->find.
 
 sub find(@)   {${(shift)}->find(@_) }
@@ -82,9 +82,9 @@ sub find(@)   {${(shift)}->find(@_) }
 
 sub select(@) {${(shift)}->select(@_) }
 
-#: my  $object = $show->change(style-elem => name, options);  #sel-style
+#: my $object  = $show->change(style-elem => name, options);  #sel-style
 #: my @objects = $show->change(style-elem => 'ALL', options);
-#: my  $object = $show->find(style => name)->change(style-elem=>name, options);
+#: my $object  = $show->find(style => name)->change(style-elem=>name, options);
 
 sub change(@) {${(shift)}->changeDefaults(@_) }
 
@@ -97,6 +97,6 @@ sub Photo(@)       {${(shift)}->Photo(@_) }
 #: my $exporter = $show->addExporter(module-name, options);
 #: my $exporter = $show->addExporter(exporter-object, options);
 
-sub addExporter($@){${(shift)}->addExporter(@_) }
+sub addExporter(@) {${(shift)}->addExporter(@_) }
 
 1;

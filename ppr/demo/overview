@@ -198,7 +198,7 @@ MAIN
 
 
 $show->addSlide
-    ( -title      => 'Showing images'
+    ( -title      => 'Nested lists'
     , -main       => <<MAIN
 No nesting.
 <UL>

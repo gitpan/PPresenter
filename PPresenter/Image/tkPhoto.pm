@@ -69,7 +69,8 @@ sub scale_photo($$$)
 
     if($scaling>1.5)
     {   $scaling = int($scaling+0.5);
-        warn "Poor image quality because $img is enlarged by factor $scaling.\n" if $^W;
+        warn "Poor image quality because $img is enlarged (by $scaling).\n"
+            if $^W;
 
         print PPresenter::TRACE
              "Zoom Tk::Photo $img $scaling times for viewport $viewport.\n";

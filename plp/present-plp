@@ -1,0 +1,25 @@
+#!/usr/bin/perl -w
+# Present PerlPoint presentations.
+
+use strict;
+use PPresenter;
+use PerlPoint::Backend;
+
+my $show = PPresenter->new();
+my $plp  = PerlPoint::Backend->new
+  ( name  => 'PPresenter'
+  );
+
+#
+# Read the PerlPoint presentation into slides.
+#
+
+my %accept;
+
+my @tokens;
+$plp->run
+  ( stream => \@tokens
+  , tags   => \%accept
+  , files  => \@ARGV
+  );
+

@@ -1,4 +1,10 @@
 
+v1.15 2001/02/17
+* Changed the interface to Image::Magick somewhat, because that package
+  gave some problems (core-dumps and such like).  Now, transport between
+  Image::Magick and Tk::Photo objects is done by a base64'd gif i.s.o
+  a xpm.
+
 v1.14 2000/10/24
 * Removed some `local @_' warnings.
 * Moved to PPresenter.org domain.

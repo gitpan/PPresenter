@@ -55,33 +55,34 @@ sub prepare($$)
     else
     {   $orig = Image::Magick->new;
         if(my $err = $orig->Read($img->{source}))
-        {   print "$err\n";
+        {   print "$err while reading $img->{source}.\n";
             return undef;
         }
     }
+
+    #
+    # Transparency
+    #
 
     if($orig->Get('matte'))
     {   # Scaling of transparent images and exporting Blobs to tkPhoto
         # for transparent images are both not perfectly implemented:
         # some dirty hacks required.
         $copy = $orig->Clone;
+        warn "Clone failed: $copy\n" unless ref $copy;
 
-        # Fill-up transparent pixels with background color before
-        # scaling or exporting.  Solution taken here is not perfect:
-        # transparent pixel at least at (0,0) and all must be neighbours.
-        # Looking for a better solution.
-        $copy->Draw( primitive => 'Color', method => 'Replace'
-                   , points    => '0,0',   pen    => $bgcolor);
-#$copy->Opaque(color => $copy->Get('mattecolor'), pen => $bgcolor);
     }
     else
-    {   # No transparency makes life much easier.
+    {   # No transparency makes life much easier: image become independent
+        # from the background color.
         $vplabel = "photo_$viewport";
         return $vplabel if exists $img->{$vplabel};
         $copy = $orig->Clone;
     }
 
-    my $scaling = $img->scaling($viewport);
+    # Do scaling.
+
+    my $scaling     = $img->scaling($viewport);
 
     warn "Poor image quality because $img is enlarged by factor $scaling.\n"
         if $^W && $scaling > 1.1;
@@ -105,11 +106,12 @@ sub prepare($$)
 sub make_photo($$)
 {   my ($img, $magick, $canvas) = @_;
 
-    $magick->Set(magick => 'xpm');
+    $magick->Set(magick => 'gif', compress => 'None');
 
+    use MIME::Base64;
     $canvas->Photo
-      ( -data   => $magick->ImageToBlob
-      , -format => 'xpm'
+      ( -data   => encode_base64(($magick->ImageToBlob)[0])
+      , -format => 'gif'
       , -width  => $magick->Get('width')
       , -height => $magick->Get('height')
       );
