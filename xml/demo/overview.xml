@@ -15,7 +15,7 @@ This is the XML re-implementation of Mark Overmeer's "overview" demo.
  <body>
   <p align='center'><larger color='red'>Portable Presenter</larger></p>
   <p align='center'><smaller>by</smaller><br/>Mark Overmeer</p><br/>
-  <p align='center'><tt><b>markov@dhp.nl</b></tt></p>
+  <p align='center'><tt><b>Mark@Overmeer.net</b></tt></p>
  </body>
  <notes>
 This is only to demonstrate some of the features of
@@ -165,12 +165,12 @@ You may <code>align</code> to the left, center, and right.
 
 <slide title='Exploding' template='dtm'>
  <body>
-  <a show="after 5 to e"><img src="perl.gif" align='left'/></a>
-  <a show="after 5 to s"><img src="perl.gif" align='right'/></a>
+  <a show="after 5 to e"><img src="perlmagick.gif" align='left'/></a>
+  <a show="after 5 to s"><img src="perlmagick.gif" align='right'/></a>
   A bit of text in between the images.<br/>
   I don't know how this should look like.<br/>
-  <a show="after 5 to n"><img src="perl.gif" align='left'/></a>
-  <a show="after 5 to w"><img src="perl.gif" align='right'/></a>
+  <a show="after 5 to n"><img src="perlmagick.gif" align='left'/></a>
+  <a show="after 5 to w"><img src="perlmagick.gif" align='right'/></a>
  </body>
 </slide>
 

@@ -23,7 +23,7 @@ else
 
 WriteMakefile
 ( NAME      => 'PPresenter - XML'
-, VERSION   => 'v1.13'
+, VERSION   => 'v1.14'
 , AUTHOR    => 'Johan Vromans'
 
 , EXE_FILES => $bins

@@ -64,7 +64,7 @@ my $s = $show->addSlide
 <P>
 <SMALL>by</SMALL><BR>
 Mark Overmeer<BR>
-<EMAIL>markov\@dhp.nl</EMAIL>
+<EMAIL>Mark\@Overmeer.net</EMAIL>
 <P>
 MAIN
     , -notes      => <<NOTES

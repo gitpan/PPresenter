@@ -540,7 +540,7 @@ sub decode_string($)
 {   my $string = shift;
     return '' if !defined $string || $string eq '';
 
-    local @_ = split /\&(\w+)\;/, $string;
+    @_ = split /\&(\w+)\;/, $string;
     return $string if @_ == 1;           # no specials
 
     my $translations = $self->{specials};

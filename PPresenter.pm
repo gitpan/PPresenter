@@ -5,7 +5,7 @@ package PPresenter;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = 'v1.13';
+$VERSION = 'v1.14';
 
 # This package works like an interface description to the Show.pm
 # package, which runs the show.  The interface is defined to restrict
@@ -17,7 +17,7 @@ use PPresenter::Show;
 
 sub copyright()
 {   <<COPYLEFT
-Portable Presenter v$VERSION (2000/07/04), Mark Overmeer.
+Portable Presenter v$VERSION (2000/10/24), Mark Overmeer.
 Copyright (C) 2000, Free Software Foundation FSF.
 PPresenter is available under GPL, and comes with absolutely NO WARRANTY.  
 Please read the copyright message.
@@ -26,7 +26,7 @@ COPYLEFT
 }
 
 #: use PPresenter
-#: my $show = PPresenter->new(@args);     # args from %Show::defaults
+#: my $show = PPresenter->new(@args);     # args from %Show::ObjDefaults
 
 sub new($@)
 {   my $class = shift;
@@ -35,7 +35,7 @@ sub new($@)
 
     my $show = PPresenter::Show->new(@_);
 
-    bless \$show, $class;
+    bless \$show, $class;                 # ref to Show to hide methods of Show.
 }
 
 sub run()           {${(shift)}->run }

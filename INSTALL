@@ -30,6 +30,9 @@ You can best compile Perl and Perl/Tk yourself (best chance that it will
 work together).  For ImageMagick, the binary distribution is linked to
 most image libraries: that's quite a lot of work to collect yourself.
 
+You may want to have a look at the manual how to improve your X-fonts:
+    http://www.linuxdoc.org/HOWTO/mini/FDU/
+
 ** Installing this package.
 
 Unpack the package (hey! you did of course, otherwise you wouldn't
@@ -54,7 +57,7 @@ WARNING:
 
 ** Questions?
 
-For questions, bug reports, and contributions mail to: gpp@dhp.nl
+For questions, bug reports, and contributions mail to: info@ppresenter.org
 
 Mark Overmeer
-http://www.dhp.nl/~markov/
+http://mark.overmeer.net

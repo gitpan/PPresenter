@@ -1,4 +1,8 @@
 
+v1.14 2000/10/24
+* Removed some `local @_' warnings.
+* Moved to PPresenter.org domain.
+
 v1.13  2000/7/4  (one year's celebration)
 * Added XML handling, by Johan Vromans <jvromans@squirrel.nl>
 * Command present installed from subdir ppr.  Demo's for using PPresenter

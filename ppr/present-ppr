@@ -26,13 +26,13 @@ sub stripFlag($)
 
 usage 0 if stripFlag 'help' || stripFlag 'h' || stripFlag '?';
 
-unless(@ARGV == 1)
+unless(@ARGV < 1)
 {   warn "ERROR: one filename required.\n";
     usage 22;
 }
 
 my $script = shift;
-exec $script
+exec $script, @_
    or die "ERROR: Cannot run $script: $!.\n";
 
 #--------------------------------------- doc ---------------------
@@ -67,7 +67,7 @@ Show brief help message.
 =head1 SEE ALSO
 
 A full documentation in html is included in the package, and available
-on the website: C<http://www.dhp.nl/~ppresenter/>.
+on the website: C<http://ppresenter.org>.
 
 C<present(1)>, C<present-xml(1)>.
 

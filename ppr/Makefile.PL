@@ -24,7 +24,7 @@ else
 
 WriteMakefile
 ( NAME      => 'PPresenter - PPR'
-, VERSION   => 'v1.13'
+, VERSION   => 'v1.14'
 , AUTHOR    => 'Mark Overmeer'
 
 , EXE_FILES => $bins

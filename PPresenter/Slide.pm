@@ -263,12 +263,12 @@ sub prepare()
     }
     elsif(ref $callbacks->[0] eq 'ARRAY')
     {   foreach (@$callbacks)
-        {   local @_ = @$_;
+        {   @_ = @$_;
             $default_view->addProgram(shift, Tk::Callback->new([@_]) );
         }
     }
     else
-    {   local @_ = @$callbacks;
+    {   @_ = @$callbacks;
         $default_view->addProgram(shift, Tk::Callback->new([@_]) );
     }
 

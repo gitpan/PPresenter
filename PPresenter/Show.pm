@@ -21,7 +21,7 @@ use PPresenter::StyleElem;
 use PPresenter::Images;
 
 use constant ObjDefaults =>
-{ -name               => 'Gnu/Portable Presenter'
+{ -name               => 'Portable Presenter'
 , -aliases            => undef
 
 , -trace              => '/dev/null'    # /dev/tty is also useful ;)
@@ -238,7 +238,7 @@ sub findControlViewport()
     die "No viewport has control (-hasControl=>1).\n" unless @controls;
     die "Two show controls defined: @controls.\n" if @controls > 1;
 
-    return $controls[0];
+    $controls[0];
 }
 
 sub find_viewport($)

@@ -169,7 +169,7 @@ C<present-xml(1)> for the options.
 =head1 SEE ALSO
 
 A full documentation in html is included in the package, and available
-on the website: C<http://www.dhp.nl/~ppresenter/>.
+on the website: C<http://ppresenter.org>.
 
 C<present-ppr(1)>, C<present-xml(1)>.
 
