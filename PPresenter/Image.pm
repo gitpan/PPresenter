@@ -1,4 +1,4 @@
-# Copyright (C) 2000, Free Software Foundation FSF.
+# Copyright (C) 2000-2002, Free Software Foundation FSF.
 
 package PPresenter::Image;
 
@@ -53,15 +53,15 @@ sub InitObject()
 sub sameSource($)
 {   my ($img, $options) = @_;
 
-    if($options->{ino}!=0)
+    if($options->{ino}==0)
     {   # Non-UNIX, so have to fake our way out.
-        -s $options->{source} == -s $img->{source}
-        && basename $options->{source} eq basename $img->{source}
+        return -s $options->{source} == -s $img->{source}
+               && basename $options->{source} eq basename $img->{source}
     }
     else
     {   # UNIX: same file is safely detectable.
-        $options->{ino}==$img->{ino}
-        && $options->{dev}==$img->{dev}
+        return $options->{ino}==$img->{ino}
+               && $options->{dev}==$img->{dev}
     }
 }
 

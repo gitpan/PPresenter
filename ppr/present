@@ -5,7 +5,10 @@ use strict;
 use English;
 use Config;
 
-my @importers = qw(xml ppr);
+use FindBin qw/$RealBin/;
+use lib "$RealBin/../lib";
+
+my @importers = qw/xml ppr/;
 
 # When you add new types here, the program doesn't need to be changed.
 # However, you have to change the manual-page manually.

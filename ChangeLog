@@ -1,4 +1,23 @@
 
+v1.17:   Mon Aug 12 08:54:38 CEST 2002
+* Fix for PPresenter::Object::isNamed(), where -aliases option is only
+  one argument, not ref-array. [F(r)eddy SpierenBU(r)G]
+* ImageMagick changed interface (again): 'compress' --> 'compression'
+  in PPresenter/Image/Magick.pm line 109. [F(r)eddy SpierenBU(r)G]
+* xml/present-xml passed the aliases of a slide name as single scalar,
+  but from now on as ref to an array. [Ann Barcomb/Johan Vromans]
+* Added tiny manual page to PPresenter.pm
+
+v1.16
+* Fix for image-alias bug on non-UNIX in PPresenter/Image.pm
+  by [Slavan Rezic]
+* $ENV{TEMP} is used when $ENV{TMPDIR} does not exists, and has a different
+  default on Win*.  Problem reported by [Slavan Rezic]
+* [Johnathan Burchill] implemented <SUB> and <SUP> in
+  PPresenter/Formatter/Markup_place.pm
+* [Stephen Riehm] scripts present(-xml|-ppr)? search more thoroughly
+  for the libraries.
+
 v1.15 2001/02/17
 * Changed the interface to Image::Magick somewhat, because that package
   gave some problems (core-dumps and such like).  Now, transport between

@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl -w
-# Copyright (C) 2000, Free Software Foundation FSF.
+# Copyright (C) 2000-2002, Free Software Foundation FSF.
 
 use ExtUtils::MakeMaker;
 use English;
@@ -8,7 +8,7 @@ use English;
 
 WriteMakefile
 ( NAME      => 'PPresenter'
-, VERSION   => 'v1.15'
+, VERSION   => 'v1.17'
 , AUTHOR    => 'Mark Overmeer'
 , ABSTRACT  => 'Create presentations with Perl and Tk'
 , PREREQ_PM => { "Tk"    => "800.012" }

@@ -1,4 +1,4 @@
-# Copyright (C) 2000, Free Software Foundation FSF.
+# Copyright (C) 2000-2002, Free Software Foundation FSF.
 
 package PPresenter::Formatter::Markup_html;
 

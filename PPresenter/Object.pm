@@ -1,4 +1,4 @@
-# Copyright (C) 2000, Free Software Foundation FSF.
+# Copyright (C) 2000-2002, Free Software Foundation FSF.
 
 # I would have liked to call this package UNIVERSAL, but then it
 # is also a base-class of Tk objects.  This doesn't work well
@@ -46,6 +46,7 @@ sub isNamed($)
 
     return 1  if $self->{-name} eq $name;
     return 0  unless defined $self->{-aliases};
+    return $self->{-aliases} eq $name unless ref $self->{-aliases};
     return grep {$_ eq $name} @{$self->{-aliases}};
 }
 

@@ -4,6 +4,9 @@ use strict;
 use English;
 use Getopt::Long;
 
+use FindBin qw/$RealBin/;
+use lib "$RealBin/../lib";
+
 sub usage($)
 {   my $rc = shift;
 

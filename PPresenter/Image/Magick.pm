@@ -1,4 +1,4 @@
-# Copyright (C) 2000, Free Software Foundation FSF.
+# Copyright (C) 2000-2002, Free Software Foundation FSF.
 
 package PPresenter::Image::Magick;
 
@@ -106,7 +106,7 @@ sub prepare($$)
 sub make_photo($$)
 {   my ($img, $magick, $canvas) = @_;
 
-    $magick->Set(magick => 'gif', compress => 'None');
+    $magick->Set(magick => 'gif', compression => 'None');
 
     use MIME::Base64;
     $canvas->Photo

@@ -1,4 +1,4 @@
-# Copyright (C) 2000, Free Software Foundation FSF.
+# Copyright (C) 2000-2002, Free Software Foundation FSF.
 
 package PPresenter::Export::Website::HTML;
 
@@ -326,7 +326,7 @@ index
 sub MainPageIndex($$)
 {   my ($export, $show, $links) = @_;
 
-    my $length = int((@_+1)/2);     # length 2 column list.
+    my $length = int((@$links+1)/2);     # length 2 column list.
 
     my @rows;
     for(my ($row, $row2) = (0,$length); $row <$length; $row++, $row2++)

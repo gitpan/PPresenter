@@ -1,4 +1,4 @@
-# Copyright (C) 2000, Free Software Foundation FSF.
+# Copyright (C) 2000-2002, Free Software Foundation FSF.
 
 package PPresenter::Export;
 
@@ -101,7 +101,7 @@ sub windowImage($$$$)
 
 sub get_x11_image($$$)
 {   my ($export, $show, $slide, $view) = @_;
-    my $tmp      = ($ENV{'TMPDIR'} || '/tmp')."/gpp$$-$imgs_read.xwd";
+    my $tmp      = ($ENV{TMPDIR} || '/tmp')."/gpp$$-$imgs_read.xwd";
 
     my $borders  = $export->{-includeBorders};
     my $viewport = $view->viewport;

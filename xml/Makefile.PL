@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl -w
-# Copyright (C) 2000, Free Software Foundation FSF.
+# Copyright (C) 2000-2002, Free Software Foundation FSF.
 
 use ExtUtils::MakeMaker;
 use English;
@@ -23,7 +23,7 @@ else
 
 WriteMakefile
 ( NAME      => 'PPresenter - XML'
-, VERSION   => 'v1.15'
+, VERSION   => 'v1.17'
 , AUTHOR    => 'Johan Vromans'
 
 , EXE_FILES => $bins

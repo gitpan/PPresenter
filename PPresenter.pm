@@ -1,11 +1,11 @@
-# Copyright (C) 2000, Free Software Foundation FSF.
+# Copyright (C) 2000-2002, Free Software Foundation FSF.
 
 package PPresenter;
 
 use strict;
 use vars qw($VERSION);
 
-$VERSION = 'v1.15';
+$VERSION = 'v1.17';
 
 # This package works like an interface description to the Show.pm
 # package, which runs the show.  The interface is defined to restrict
@@ -17,8 +17,8 @@ use PPresenter::Show;
 
 sub copyright()
 {   <<COPYLEFT
-Portable Presenter v$VERSION (2001/02/17), Mark Overmeer.
-Copyright (C) 2000, Free Software Foundation FSF.
+Portable Presenter $VERSION (2002/08/12), Mark Overmeer.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
 PPresenter is available under GPL, and comes with absolutely NO WARRANTY.  
 Please read the copyright message.
 
@@ -99,4 +99,35 @@ sub Photo(@)       {${(shift)}->Photo(@_) }
 
 sub addExporter(@) {${(shift)}->addExporter(@_) }
 
+# Portability fix for Windows
+$ENV{TMPDIR} ||= $ENV{TEMP} || ($^O =~ /^Win/ ? 'C:/temp' : '/var/tmp');
+
 1;
+__END__
+
+=head1 NAME
+
+PPresenter - Slide shows written in Perl (or XML)
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+I<Portable Presenter> (PPresenter) is a package designed to give presentations.
+It is written in pure Perl/Tk, which is available for UNIX and for Windows.
+
+=head1 SEE ALSO
+
+The documentation for PPresenter can be found at its web-site:
+L<http://ppresenter.org>.
+
+=head1 AUTHOR
+
+Mark Overmeer (F<mailbox@overmeer.net>).
+
+Copyright (c) 2001-2002 Mark Overmeer. All rights reserved.
+All rights reserved.  This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+cut
+

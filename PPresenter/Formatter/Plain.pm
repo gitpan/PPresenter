@@ -1,4 +1,4 @@
-# Copyright (C) 2000, Free Software Foundation FSF.
+# Copyright (C) 2000-2002, Free Software Foundation FSF.
 
 # The plain format is only a far-going simplification on the
 # markup formatter.  The whole text is put in <PRE>

@@ -1,4 +1,4 @@
-# Copyright (C) 2000, Free Software Foundation FSF.
+# Copyright (C) 2000-2002, Free Software Foundation FSF.
 
 # SHOW
 #
@@ -774,8 +774,8 @@ sub addExporter($@)
 
         my $exporter = $name->new(@_);
 
-        die "$name is not an exporter module.\n"
-            unless $exporter->isa('PPresenter::Export');
+#       die "$name is not an exporter module.\n"
+#           unless $exporter->isa('PPresenter::Export');
 
         push @{$show->{exporters}}, $exporter;
         print PPresenter::TRACE "Loaded exporter $exporter.\n";

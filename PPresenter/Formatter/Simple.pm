@@ -1,4 +1,4 @@
-# Copyright (C) 2000, Free Software Foundation FSF.
+# Copyright (C) 2000-2002, Free Software Foundation FSF.
 
 # Simple formatter is a simplification of the markup formatter: you
 # specify nesting with dashes, that's all.

@@ -1,4 +1,4 @@
-# Copyright (C) 2000, Free Software Foundation FSF.
+# Copyright (C) 2000-2002, Free Software Foundation FSF.
 
 package PPresenter::Formatter::Markup_placer;
 
@@ -45,6 +45,7 @@ sub place($$$)
     , rindent    => 0  # right-side indentation.
     , reformatText=> 1
     , align      => 'left'
+    , basealign  => 'none'
     , is_paragraph => 0
     , nesting    => 0
 
@@ -110,8 +111,8 @@ my %command_action;
 , PROP => sub { $b{fonttype} = 'PROPORTIONAL' }
 , REDO => \&restore_mark
 , RIGHT => sub { start_paragraph(@_); $b{align} = 'right' }
-, SUB  => undef
-, SUP  => undef
+, SUB  => sub { $b{fontsize} -=2; $b{basealign} = 'bottom' }
+, SUP  => sub { $b{fontsize} -=2; $b{basealign} = 'top' }
 , TEXT => sub {}
 , TT   => sub { $b{fonttype} = 'FIXED' }
 , U    => sub { $b{underline} = 1 }
@@ -371,7 +372,7 @@ sub process_line($)
            $g{linedescent}= $descent if $g{linedescent}<$descent;
 
            push @{$g{linewords}}, [ $put, $g{accumx}, $ascent, $font,
-                    $b{color}, $b{dynamictag}, $b{backdrop} ];
+                    $b{color}, $b{dynamictag}, $b{backdrop}, $b{basealign} ];
            $g{accumx} += $wordlength;
         }
     }
@@ -390,7 +391,7 @@ sub process_line($)
 
             push @{$g{linewords}},
                [ $put, $g{accumx}, $ascent, $font, $b{color}
-               , $b{dynamictag}, $b{backdrop} ];
+               , $b{dynamictag}, $b{backdrop}, $b{basealign} ];
             $g{accumx}     += $wordlength;
 
             flush_line if @lines > 0;
@@ -420,14 +421,18 @@ sub flush_line()
     $g{accumy}  += $g{lineascent} + $g{linedescent};
 
     # Realization of words.
+    my $refascent = 0;
+    my $baseoffset;
     my @linewords = @{$g{linewords}};
+
     while(@linewords>0)
-    {   my $word = shift @linewords; # [ text,x,ascent,font,color,tag,bd ]
-        my ($text, $x, $ascent, $font, $color, $dynamictag, $backdrop) = @$word;
+    {   my $word = shift @linewords; # [ text,x,ascent,font,color,tag,bd,va ]
+        my ($text, $x, $ascent, $font, $color, $dynamictag, $backdrop,
+            $vert_align) = @$word;
         while(@linewords > 0
            && $linewords[0][2]==$ascent   && $linewords[0][3]."" eq $font.""
            && $linewords[0][4] eq $color  && $linewords[0][5] eq $dynamictag
-           && $linewords[0][6] eq $backdrop)
+           && $linewords[0][6] eq $backdrop && $linewords[0][7] eq $vert_align)
         {   # Note: same font but different ascent possible for sub/superscript
             $text .= $linewords[0][0];
             shift @linewords;
@@ -436,11 +441,15 @@ sub flush_line()
         my @tags = @g{ 'slidetag', 'parttag' };
         push @tags, $dynamictag if defined $dynamictag;
 
+        $baseoffset = $vert_align eq 'top'    ? int($refascent*1.1-$ascent)
+                    : $vert_align eq 'bottom' ? int(-$refascent*.2)
+                    : 0;
+
         if($backdrop)
         {   my $backdrop = int ($ascent/12);
             $g{canvas}->createText
             ( $x+$xcorrect+$backdrop,
-            , $baseline-$ascent+$backdrop
+            , $baseline-$ascent+$backdrop-$baseoffset
             , -text   => $text
             , -anchor => 'nw'
             , -fill   => $g{view}->color('BDCOLOR')
@@ -451,7 +460,7 @@ sub flush_line()
         }
 
         $g{canvas}->createText
-        ( $x+$xcorrect, $baseline-$ascent
+        ( $x+$xcorrect, $baseline-$ascent-$baseoffset
         , -text   => $text
         , -anchor => 'nw'
         , -fill   => $color
@@ -459,6 +468,8 @@ sub flush_line()
         , -tags   => \@tags
         , -width  => 0
         );
+
+        $refascent = $ascent;
     }
 
     # List-items can only be produced when we know the height of
@@ -562,3 +573,4 @@ sub decode_string($)
 }
 
 1;
+

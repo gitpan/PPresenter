@@ -1,4 +1,4 @@
-# Copyright (C) 2000, Free Software Foundation FSF.
+# Copyright (C) 2000-2002, Free Software Foundation FSF.
 # This module was created mainly as demonstration how to work with
 # the flexability offered by the Decoration module.
 
