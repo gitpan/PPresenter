@@ -5,7 +5,7 @@ package PPresenter;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = 'v1.10';
+$VERSION = 'v1.13';
 
 # This package works like an interface description to the Show.pm
 # package, which runs the show.  The interface is defined to restrict
@@ -17,7 +17,7 @@ use PPresenter::Show;
 
 sub copyright()
 {   <<COPYLEFT
-Portable Presenter v$VERSION (2000/06/05), Mark Overmeer.
+Portable Presenter v$VERSION (2000/07/04), Mark Overmeer.
 Copyright (C) 2000, Free Software Foundation FSF.
 PPresenter is available under GPL, and comes with absolutely NO WARRANTY.  
 Please read the copyright message.

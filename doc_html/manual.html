@@ -13,6 +13,7 @@
 <A HREF=index.html>PPresenter</A><BR>
 <B>Manual</B>
 <P>
+<A HREF=http://www.dhp.nl/~ppresenter/download/index.html>Download</A></BR>
 <A HREF=example.html>Example</A><BR>
 <P>
     </TD><TD VALIGN=top>
@@ -25,8 +26,8 @@ and extended.
 
 <P>
 The software and the manual-pages are ready to be tested and used.
-These 54 pages of documentation describe version
-PPresenter v1.10 (published 2000/06/05).  It contains description of
+These 61 pages of documentation describe version
+PPresenter v1.13 (published 2000/07/04).  It contains description of
 the functionality, and a few tutorials.
 <P>
 Please contribute to this document.
@@ -39,6 +40,7 @@ as you may have guessed).
 <TR><TD VALIGN=top>
 
 <A HREF=#PerlTk>Perl/Tk</A><BR>
+<A HREF=#running>Running</A><BR>
 <A HREF=#show>A show</A><BR>
 <A HREF=tutorial/index.html>Tutorials</A><BR>
 <A HREF=download/index.html>Download</A><BR>
@@ -49,8 +51,6 @@ as you may have guessed).
 
     </TD><TD VALIGN=top>
 
-<H2><A NAME=howto>How to</A></H2>
-
 <UL>
 <LI><A NAME=PerlTk>Perl/Tk</A>
     <UL>
@@ -59,8 +59,20 @@ as you may have guessed).
     <LI>Optional packages for PPresenter.
     </UL>
     <P>
-<LI><A HREF=show/index.html><B><FONT COLOR=green>Structure of a show</FONT></B></A>.
-    Read this to start understanding what you are doing.<BR>
+
+<LI><A NAME=running><B><FONT COLOR=green>Running a presentation</B></FONT></A>.<BR>
+    There are three ways to run a presentation:
+    <UL>
+    <LI>Write a runnable perl-program using the PPresenter modules.
+    <LI>Run the same perl-program with the command
+        <A HREF=ppr/present1.html><CODE>present(1)</CODE></A>.
+    <LI><B><A HREF=xml/index.html><FONT COLOR=green>XML</FONT></A></B>: Write the presentation in xml,
+        and run it with the <CODE>present</CODE> command.
+    </UL>
+    <P>
+
+<LI><A HREF=show/index.html><B><FONT COLOR=green>Structure of a show</FONT></B></A>.<BR>
+    Read this to start understanding how the library is structured.<BR>
     <A NAME=show>A show has</A>
     <UL>
     <LI>initiation via
@@ -167,7 +179,7 @@ as you may have guessed).
 <HR NOSHADE>
 Portable Presenter is written and maintained by
 <A HREF=http://www.dhp.nl/~markov/>Mark Overmeer</A>.
-There is no relation between this software product and his employer.<BR>
+There is no relation between this software product and his employer.
 Copyright (C) 2000, Free Software Foundation FSF.
 
 

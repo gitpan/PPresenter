@@ -6,7 +6,7 @@
 # window is produced from the data below.
 #
 
-use lib '..';
+use lib '../..';
 use PPresenter;
 
 my $show = PPresenter->new
@@ -22,11 +22,13 @@ $show->addSlide
    ( -title      => 'first slide'
    , -reqtime    => 75
    , -main       => <<MAIN
+PPresenter supports slide-timing and dynamics.
+<P>
 You start the show with <TT>g</TT>, and halt it
 with <TT>h</TT>.
 <P>
-Start the timer now, and see the progress bar moving
-slowly.
+Start the timer now, and see the progress bar (bottom)
+moving slowly forwards.
 MAIN
    );
 
@@ -43,32 +45,45 @@ $show->addSlide
 The second slide was skipped, because it is not
 selected.
 <P>
-See the popup (press <TT>s</TT>)
+See the popup (press <TT>s</TT>) how this is done.
 MAIN
    );
 
 $show->addSlide
    ( -title      => 'fourth slide'
    , -reqtime    => 30
+   , -main       => <<MAIN
+When you move to the next slide, you see the next
+button on the bottom become green.
+<P>
+You can disable all extra's on the bottom via the
+background menu.
+MAIN
    );
 
 $show->addSlide
    ( -title      => 'fifth slide: proceeds immediately'
    , -tag        => 'shorter'
    , -proceed    => 'NOW'
+   , -main       => <<MAIN
+Only works if the show is running (you pressed <CODE>g</CODE>)
+MAIN
    );
 
 $show->addSlide
-   ( -title      => 'sixth slide'
+   ( -title      => 'sixth slide, tags'
    , -tags       => [ 'shorter', 'panic' ]
    , -main       => <<MAIN
-To demonstrate tags.  Play around with them!  (in the control menu)
+Tags are used to select or disable whole sets of slides.
+Play around with them in the control menu (press <CODE>s</CODE>).
 MAIN
    );
 
 $show->addSlide
    ( -title      => 'seventh slide'
    , -tags       => 'panic'
+   , -main       => <<MAIN
+MAIN
    );
 
 $show->run

@@ -62,7 +62,8 @@ STYLE-ELEMENTS
 EXPORT
     Export.pm          Extends Object and provides contact between GPP and
                        the exporter modules.
-        HTML.pm            Convert into website.
-        IM_Images.pm       Screen-dumps to image with Image::Magick.
-        IM_PostScript.pm   Export to postscript document with Image::Magick.
-        PostScript.pm      Tk postscript dump of screen (very poor result)
+        Website/HTML.pm           Convert into website.
+        Images/ImageMagick.pm     Screen-dumps to image with Image::Magick.
+        Handouts/IM_PostScript.pm Export to postscript document with Image::Magick.
+        Handouts/PostScript.pm    Tk postscript dump of screen (very poor result)
+

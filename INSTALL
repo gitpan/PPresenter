@@ -22,7 +22,9 @@ it might be that earlier versions work too.
 For ImageMagick:       (optional)
 http://www.ImageMagick.org
 - ImageMagick v4.2.9 and PerlMagick v4.29   Other version will work
-  too, as long as the ImageMagick and PerlMagick versions match!
+  too, as long as the ImageMagick and PerlMagick versions match!  This
+  is wrong for some Linux Distributions.
+  Newer versions of ImageMagick will work too.
 
 You can best compile Perl and Perl/Tk yourself (best chance that it will
 work together).  For ImageMagick, the binary distribution is linked to

@@ -4,7 +4,7 @@
 # This file demonstrates the existing of formatters.
 #
 
-use lib '..';
+use lib '../..';
 use PPresenter;
 
 my $show = PPresenter->new

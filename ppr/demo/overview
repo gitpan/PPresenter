@@ -4,7 +4,7 @@
 # This file is overly complicated to demonstrate some of the possibilities.
 # Experiment a bit with (un-)commenting option lines.
 
-use lib '..';
+use lib '../..';
 use strict;
 
 #
@@ -130,7 +130,7 @@ $show->addSlide
     , -template   => 'dtm'
     , -main       => <<MAIN
 some text is put above the image.
-<BR ALIGN=center><IMG SRC="gpp_large.gif" BASE=1280x1024>x</BR>
+<BR ALIGN=center><IMG SRC="ppr_large.gif" BASE=1280x1024>x</BR>
 And some text below.
 MAIN
     );
@@ -219,11 +219,11 @@ MAIN
 $show->addSlide
     ( -title      => 'Showing images -2'
     , -main       => <<MAIN
-<IMG SRC="gpp_large.gif" ALIGN=left>
-Just a littlebit of text to see if the bounds are set right.  Do you
-believe this?  Worked in the first try!<P>
-You know that text just floats around it?<BR>
-It is what we need for the frontpage at least.
+<IMG SRC="ppr_large.gif" ALIGN=left>
+Just a short text to see if the bounds are set right.
+Text just flows around the image, just as in HTML.<BR>
+Like HTML, you may specify <CODE B>VSPACE</CODE> and <CODE B>HSPACE</CODE>.
+You may <CODE B>ALIGN</CODE> to the left, center, and right.
 MAIN
     );
 
@@ -231,12 +231,12 @@ $show->addSlide
     ( -title      => 'Exploding'
     , -template   => 'dtm'
     , -main       => <<MAIN
-<A SHOW="after 5 to e"><IMG SRC="perl.gif" ALIGN=left></A>
-<A SHOW="after 5 to s"><IMG SRC="perl.gif" ALIGN=right></A>
+<A SHOW="after 5 to e"><IMG SRC="perlmagick.gif" ALIGN=left></A>
+<A SHOW="after 5 to s"><IMG SRC="perlmagick.gif" ALIGN=right></A>
 A bit of text in between the images.<BR>
 I don't know how this should look like.<BR>
-<A SHOW="after 5 to n"><IMG SRC="perl.gif" ALIGN=left></A>
-<A SHOW="after 5 to w"><IMG SRC="perl.gif" ALIGN=right></A>
+<A SHOW="after 5 to n"><IMG SRC="perlmagick.gif" ALIGN=left></A>
+<A SHOW="after 5 to w"><IMG SRC="perlmagick.gif" ALIGN=right></A>
 MAIN
     );
 
@@ -268,7 +268,7 @@ Is preformatted:
       c     42
 </PRE>
 LEFT
-    , -right      => '<IMG SRC=gpp_large.gif>'
+    , -right      => '<IMG SRC=ppr_large.gif>'
     , -notes      => <<NOTES
 Ok, we can add notes for a slide, when we like.
 It is shown on the seperate control screen (if there is).

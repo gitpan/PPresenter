@@ -1,3 +1,18 @@
+
+v1.13  2000/7/4  (one year's celebration)
+* Added XML handling, by Johan Vromans <jvromans@squirrel.nl>
+* Command present installed from subdir ppr.  Demo's for using PPresenter
+  as library moved to ppr/demo.
+* Command present-xml installed from subdir xml.  Demo's for XML implementation
+  based on the PPresenter library are located in xml/demo.
+* Removed demo directory, because the demo's are split based on their type.
+* Added some images in PPresenter/images.
+* Manual-pages for present, present-ppr, present-xml, but they need more
+  detail.
+
+v1.11
+* Fixed use of tkPhoto images instead when Image::Magick is not installed.
+
 v1.10
 * Excellent logo by Phil Regnauld <regnauld@ftf.net>
 * Renamed Presenter::TRACE into the correct PPresenter::TRACE.

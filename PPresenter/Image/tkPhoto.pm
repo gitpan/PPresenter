@@ -4,9 +4,8 @@ package PPresenter::Image::tkPhoto;
 
 use strict;
 use Tk::Photo;
-use Tk::Derived;
 use PPresenter::Image;
-use base qw(Tk::Derived PPresenter::Image Tk::Photo);
+use base qw(PPresenter::Image Tk::Photo);
 
 my $unique;
 

@@ -2,7 +2,7 @@
 # Copyright (C) 2000, Free Software Foundation FSF.
 #
 
-use lib '..';
+use lib '../..';
 use strict;
 
 # This is doing the job: invoke Portable Presenter.

@@ -10,11 +10,16 @@ Some wishes:
 - Dump screens to Postscript.
   Works partially, but the question is whether ImageMagick, my printer, or
   PPresenter is corrupting the output when slide-images are larger than
-  A5 (half of a4).
-
-- Dump presentation to Website.
-  Now only finals of the slides.  Would be nice to permit intermediate
-  slide-phases too.
+  A5 (half of a4).  Might e solved by IM5.2 with large memory.
 
 - Slides can only be exported as images.  need to create a covertion from
   Markup into real HTML to facilitate other exports.
+
+- Processing command-line arguments.  Command-line arguments should be
+  passed-on to the show-creation.
+
+- Documentation on XML.
+
+- Extention of XML.
+
+- Language corrections of the documentation.
